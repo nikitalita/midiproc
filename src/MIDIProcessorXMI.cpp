@@ -2,10 +2,10 @@
 /** $VER: MIDIProcessorXMI.cpp (2023.08.14) Extended Multiple Instrument Digital Interface (http://www.vgmpf.com/Wiki/index.php?title=XMI) **/
 
 #include "MIDIProcessor.h"
+#include "common_compat.h"
+#include "os_compat.h"
 
-#include <Windows.h>
-
-#include <string.h>
+#include "string_compat.h"
 
 const FOURCC FOURCC_FORM = mmioFOURCC('F', 'O', 'R', 'M');
 const FOURCC FOURCC_CAT  = mmioFOURCC('C', 'A', 'T', ' ');

@@ -3,8 +3,8 @@
 
 #include "MIDIProcessor.h"
 
-#include <string.h>
-
+#include "string_compat.h"
+#include "common_compat.h"
 #define ENABLE_WHEEL
 //#define ENABLE_VIB
 //#define ENABLE_ARP

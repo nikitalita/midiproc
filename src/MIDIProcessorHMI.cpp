@@ -2,6 +2,7 @@
 /** $VER: MIDIProcessorHMI.cpp (2023.08.14) Human Machine Interface (http://www.vgmpf.com/Wiki/index.php?title=HMI) **/
 
 #include "MIDIProcessor.h"
+#include "common_compat.h"
 
 bool MIDIProcessor::IsHMI(std::vector<uint8_t> const & p_file)
 {

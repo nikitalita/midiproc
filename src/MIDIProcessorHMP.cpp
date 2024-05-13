@@ -2,7 +2,7 @@
 /** $VER: MIDIProcessorHMP.cpp (2023.08.14) Human Machine Interfaces MIDI P (http://www.vgmpf.com/Wiki/index.php?title=HMP) **/
 
 #include "MIDIProcessor.h"
-
+#include "common_compat.h"
 bool MIDIProcessor::IsHMP(std::vector<uint8_t> const & data)
 {
     if (data.size() < 8)
