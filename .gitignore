@@ -2,3 +2,5 @@ build/
 .vscode/
 test-files/
 .DS_Store
+vcpkg_installed/
+install/

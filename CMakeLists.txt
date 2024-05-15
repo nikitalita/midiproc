@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.18)
 
 project(midiproc VERSION 0.1.0 LANGUAGES CXX C)
 
@@ -14,6 +14,25 @@ target_include_directories(${MIDIPROC_TARGET_NAME} PRIVATE compat)
 add_executable(test test/test_midiproc.c)
 target_include_directories(test PRIVATE src)
 
+
+option(BUILD_SDL_TEST "Build the SDL test" OFF)
+if (BUILD_SDL_TEST)
+    find_package(SDL2 CONFIG REQUIRED)
+    find_package(SDL2_mixer_ext CONFIG REQUIRED)
+    add_executable(sdl_test test/test_sdl.c)
+    target_include_directories(sdl_test PUBLIC src)
+    target_include_directories(sdl_test PUBLIC compat)
+
+    target_link_libraries(sdl_test
+         PUBLIC
+         $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+         $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+     )
+    target_link_libraries(sdl_test PUBLIC $<IF:$<TARGET_EXISTS:SDL2_mixer_ext::SDL2_mixer_ext>,SDL2_mixer_ext::SDL2_mixer_ext,SDL2_mixer_ext::SDL2_mixer_ext_Static>)
+    target_link_libraries(sdl_test PUBLIC ${MIDIPROC_TARGET_NAME})
+endif()
+
+
 target_link_libraries(test ${MIDIPROC_TARGET_NAME})
 
 
@@ -27,16 +46,26 @@ if(NOT DEFINED CMAKE_INSTALL_INCLUDEDIR)
     set(CMAKE_INSTALL_INCLUDEDIR "${CMAKE_INSTALL_PREFIX}/include")
 endif()
 
+#check if the share directory is defined
+if(NOT DEFINED CMAKE_INSTALL_SHAREDIR)
+    set(CMAKE_INSTALL_SHAREDIR "${CMAKE_INSTALL_PREFIX}/share")
+endif()
+
 
 set(MIDIPROC_TARGETS_EXPORT_NAME       "${PROJECT_NAME}-targets")
 set(MIDIPROC_CONFIG_INSTALL_DIR        "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}" CACHE INTERNAL "")
+set(MIDIPROC_PKGCONFIG_INSTALL_DIR     "${CMAKE_INSTALL_LIBDIR}/pkgconfig" CACHE INTERNAL "")
 set(MIDIPROC_INCLUDE_INSTALL_DIR       "${CMAKE_INSTALL_INCLUDEDIR}/midiproc" CACHE INTERNAL "")
+set(MIDIPROC_SHARE_INSTALL_DIR         "${CMAKE_INSTALL_SHAREDIR}/midiproc" CACHE INTERNAL "")
 set(MIDIPROC_TARGETS_EXPORT_NAME       "${PROJECT_NAME}-targets")
 set(MIDIPROC_CMAKE_CONFIG_TEMPLATE     "cmake/Config.cmake.in")
+set(MIDIPROC_CMAKE_PKGCONFIG_TEMPLATE  "cmake/Config.pc.in")
 set(MIDIPROC_CMAKE_CONFIG_DIR          "${CMAKE_CURRENT_BINARY_DIR}")
 set(MIDIPROC_CMAKE_VERSION_CONFIG_FILE "${MIDIPROC_CMAKE_CONFIG_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
 set(MIDIPROC_CMAKE_PROJECT_CONFIG_FILE "${MIDIPROC_CMAKE_CONFIG_DIR}/${PROJECT_NAME}Config.cmake")
 set(MIDIPROC_CMAKE_PROJECT_TARGETS_FILE "${MIDIPROC_CMAKE_CONFIG_DIR}/${PROJECT_NAME}-targets.cmake")
+set(MIDIPROC_CMAKE_PROJECT_PKGCONFIG_FILE "${MIDIPROC_CMAKE_CONFIG_DIR}/${MIDIPROC_TARGET_NAME}.pc")
+
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
@@ -47,6 +76,10 @@ configure_package_config_file(
 	"${MIDIPROC_CMAKE_PROJECT_CONFIG_FILE}"
 	INSTALL_DESTINATION ${MIDIPROC_CONFIG_INSTALL_DIR}
 )
+
+#configure the Config.pc.in
+configure_file(${MIDIPROC_CMAKE_PKGCONFIG_TEMPLATE} "${MIDIPROC_CMAKE_PROJECT_PKGCONFIG_FILE}" @ONLY)
+
 # configure_package_config_file(midiprocConfig.cmake.in midiprocConfig.cmake INSTALL_DESTINATION share/midiproc)
 # add install target
 install(
@@ -76,3 +109,8 @@ install(
 install(FILES ${MIDIPROC_CMAKE_VERSION_CONFIG_FILE} ${MIDIPROC_CMAKE_PROJECT_CONFIG_FILE}
 DESTINATION ${MIDIPROC_CONFIG_INSTALL_DIR})
 
+# install the pkg-config file
+install(FILES ${MIDIPROC_CMAKE_PROJECT_PKGCONFIG_FILE} DESTINATION "${MIDIPROC_PKGCONFIG_INSTALL_DIR}")
+
+# install the license into shared
+install(FILES LICENSE DESTINATION "${MIDIPROC_SHARE_INSTALL_DIR}" RENAME copyright)
