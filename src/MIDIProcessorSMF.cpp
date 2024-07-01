@@ -62,7 +62,7 @@ bool MIDIProcessor::ProcessSMF(std::vector<uint8_t> const & data, MIDIContainer 
 
     int TimeDivision = (data[12] << 8) | data[13];
 
-    if ((TimeDivision == 0))
+    if (TimeDivision == 0)
         return SetLastErrorCode(MIDIError::SMFBadHeaderTimeDivision);
 
     container.Initialize((uint32_t) Format, (uint32_t) TimeDivision);
