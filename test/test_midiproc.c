@@ -65,7 +65,7 @@ int main(int argc, char ** argv){
     }
     size_t taken = get_time_in_us() - start;
     // human readable time in ms
-    printf("Time taken: %ldus\n", taken);
+    printf("Time taken: %ldus\n", ((long)taken));
     // remove the extension from the file name and add .mid
     char * out_file_name;
     if (argc > 2)
