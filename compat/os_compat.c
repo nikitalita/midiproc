@@ -56,7 +56,7 @@ bool IsDebuggerPresent() {
     buf[num_read] = '\0';
     constexpr char tracerPidString[] = "TracerPid:";
     char *tracer_pid_ptr = strstr((const char *)buf, tracerPidString);
-    if (tracer_pid_ptr[0] == 0x00)
+    if (tracer_pid_ptr == NULL)
         return false;
 
     for (const char* characterPtr = tracer_pid_ptr + sizeof(tracerPidString) - 1; characterPtr <= buf + num_read; ++characterPtr)
