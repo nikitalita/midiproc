@@ -1,3 +1,5 @@
+#if !defined(_WIN32) && !defined(WIN32) && !defined(__WIN32__)
+
 #include "os_compat.h"
 
 #ifdef __APPLE__
@@ -22,6 +24,21 @@ bool IsDebuggerPresent() {
     return ((info.kp_proc.p_flag & P_TRACED) != 0);
 }
 #else
+#include <stdint.h>
+#include <stdbool.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <string.h>
+
+#ifdef __GNUC__
+#include <unistd.h>
+#endif
+
+#ifndef constexpr
+#define constexpr const
+#endif
+
 // linux and other unix-like systems
 bool IsDebuggerPresent() {
     char buf[4096];
@@ -38,8 +55,8 @@ bool IsDebuggerPresent() {
 
     buf[num_read] = '\0';
     constexpr char tracerPidString[] = "TracerPid:";
-    const auto tracer_pid_ptr = strstr(buf, tracerPidString);
-    if (!tracer_pid_ptr)
+    char *tracer_pid_ptr = strstr((const char *)buf, tracerPidString);
+    if (tracer_pid_ptr[0] == 0x00)
         return false;
 
     for (const char* characterPtr = tracer_pid_ptr + sizeof(tracerPidString) - 1; characterPtr <= buf + num_read; ++characterPtr)
@@ -49,6 +66,7 @@ bool IsDebuggerPresent() {
         else
             return isdigit(*characterPtr) != 0 && *characterPtr != '0';
     }
+
     return false;
 }
 #endif
@@ -66,3 +84,5 @@ void OutputDebugStringW(const WCHAR * fmt, ...) {
     va_end(args);
 #endif
 }
+
+#endif
