@@ -74,6 +74,8 @@ bool IsDebuggerPresent() {
 
 void OutputDebugStringW(const WCHAR * fmt, ...) {
 #ifdef NDEBUG
+    (void)fmt;
+
     return;
 #else
     if( !IsDebuggerPresent() )
