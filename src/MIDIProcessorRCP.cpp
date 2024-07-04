@@ -154,7 +154,7 @@ bool MIDIProcessor::ProcessRCP(std::vector<uint8_t> const & data, MIDIContainer 
             if (Size < HEADER_LENGTH || Offset + Size > data.size())
                 break; // Invalid track size;
 
-            ::swprintf_s(Text, _countof(Text), L"%08X: Track %2d/%2d, %5d bytes\n", Offset, i + 1, maxTracks, (int) Size);
+            ::swprintf_s(Text, _countof(Text), L"%08X: Track %2ld/%2kd, %5d bytes\n", ((long)Offset), ((long)i + 1), maxTracks, (int) Size);
             ::OutputDebugStringW(Text);
 
             uint8_t trackNo = Data[2]; // Track Number
@@ -206,7 +206,7 @@ bool MIDIProcessor::ProcessRCP(std::vector<uint8_t> const & data, MIDIContainer 
 
             for (size_t j = HEADER_LENGTH; j < Size; j += EVENT_LENGTH)
             {
-                ::swprintf_s(Text, _countof(Text), L"%08X: %02X %02X %02X %02X\n", j, Data[j], Data[j + 1], Data[j + 2], Data[j + 3]);
+                ::swprintf_s(Text, _countof(Text), L"%08lX: %02X %02X %02X %02X\n", ((long)j), Data[j], Data[j + 1], Data[j + 2], Data[j + 3]);
                 ::OutputDebugStringW(Text);
             }
 
