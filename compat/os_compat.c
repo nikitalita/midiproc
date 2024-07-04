@@ -23,6 +23,12 @@ bool IsDebuggerPresent() {
 
     return ((info.kp_proc.p_flag & P_TRACED) != 0);
 }
+#elif defined(ANDROID) || defined(__ANDROID__)
+#include <stdbool.h>
+
+bool IsDebuggerPresent() {
+    return false;
+}
 #else
 #include <stdint.h>
 #include <stdbool.h>
