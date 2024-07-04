@@ -1,6 +1,8 @@
 #include "midiproc.h"
 #include <stdio.h>
 #include <memory.h>
+#include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 // include time.h for time_t
