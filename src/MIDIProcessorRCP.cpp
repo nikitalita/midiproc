@@ -1,7 +1,9 @@
 
 /** $VER: MIDIProcessorRCP.cpp (2024.05.06) Recomposer Format (http://www.vgmpf.com/Wiki/index.php?title=GMF) **/
 
-#include "MIDIProcessor.h"#ifdef __linux__
+#include "MIDIProcessor.h"
+
+#ifdef __linux__
 #include <linux/limits.h>
 #endif
 
