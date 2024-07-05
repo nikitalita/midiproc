@@ -79,7 +79,7 @@ bool MIDIProcessor::ProcessSMF(std::vector<uint8_t> const & data, MIDIContainer 
 
         if (::memcmp(&Data[0], "MTrk", 4) == 0)
         {
-            if (Tail - Data < (ptrdiff_t) (8 + ChunkSize))
+            if (Tail - Data < (std::ptrdiff_t) (8 + ChunkSize))
                 return SetLastErrorCode(MIDIError::InsufficientData);
 
             Data += 8;
@@ -94,7 +94,7 @@ bool MIDIProcessor::ProcessSMF(std::vector<uint8_t> const & data, MIDIContainer 
         // Skip unknown chunks in the stream.
         else
         {
-            if (Tail - Data < (ptrdiff_t) (8 + ChunkSize))
+            if (Tail - Data < (std::ptrdiff_t) (8 + ChunkSize))
                 return SetLastErrorCode(MIDIError::InsufficientData);
 
             Data += (int64_t)(8) + ChunkSize;

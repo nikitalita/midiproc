@@ -59,7 +59,7 @@ EXPORT void MIDPROC_Container_Delete(HMIDIContainer processor);
  * @param file_extension The file extension of the data (e.g. "mid", "rcp", "lds", etc.)
  * @param container The container to store the data in (must be created with MIDPROC_Container_Create())
 */
-bool MIDPROC_Process(const uint8_t * data, size_t data_size, const char * file_extension, HMIDIContainer container);
+EXPORT bool MIDPROC_Process(const uint8_t * data, size_t data_size, const char * file_extension, HMIDIContainer container);
 
 /**
  * @brief Serialize the container as a Standard MIDI File
@@ -68,18 +68,18 @@ bool MIDPROC_Process(const uint8_t * data, size_t data_size, const char * file_e
  * @param data_out A pointer to the output data (allocated by function, must be freed by the caller)
  * @param data_out_size The size of the output data
 */
-void MIDPROC_Container_SerializeAsSMF(HMIDIContainer container, uint8_t ** data_out, size_t * data_out_size);
-uint32_t MIDPROC_Container_GetFormat(HMIDIContainer container);
-uint32_t MIDPROC_Container_GetTrackCount(HMIDIContainer container);
-uint32_t MIDPROC_Container_GetChannelCount(HMIDIContainer container, size_t subSongIndex);
-uint32_t MIDPROC_Container_GetLoopBeginTimestamp(HMIDIContainer container, size_t subSongIndex, bool ms);
-uint32_t MIDPROC_Container_GetLoopEndTimestamp(HMIDIContainer container, size_t subSongIndex, bool ms);
+EXPORT void MIDPROC_Container_SerializeAsSMF(HMIDIContainer container, uint8_t ** data_out, size_t * data_out_size);
+EXPORT uint32_t MIDPROC_Container_GetFormat(HMIDIContainer container);
+EXPORT uint32_t MIDPROC_Container_GetTrackCount(HMIDIContainer container);
+EXPORT uint32_t MIDPROC_Container_GetChannelCount(HMIDIContainer container, size_t subSongIndex);
+EXPORT uint32_t MIDPROC_Container_GetLoopBeginTimestamp(HMIDIContainer container, size_t subSongIndex, bool ms);
+EXPORT uint32_t MIDPROC_Container_GetLoopEndTimestamp(HMIDIContainer container, size_t subSongIndex, bool ms);
 //GetDuration
-uint32_t MIDPROC_Container_GetDuration(HMIDIContainer container, size_t subSongIndex, bool ms);
-size_t MIDPROC_Container_GetSubSongCount(HMIDIContainer container);
-size_t MIDPROC_Container_GetSubSong(HMIDIContainer container, size_t index);
-void MIDPROC_Container_PromoteToType1(HMIDIContainer container);
-void MIDPROC_Container_DetectLoops(HMIDIContainer container, bool detectXMILoops, bool detectMarkerLoops, bool detectRPGMakerLoops, bool detectTouhouLoops);
+EXPORT uint32_t MIDPROC_Container_GetDuration(HMIDIContainer container, size_t subSongIndex, bool ms);
+EXPORT size_t MIDPROC_Container_GetSubSongCount(HMIDIContainer container);
+EXPORT size_t MIDPROC_Container_GetSubSong(HMIDIContainer container, size_t index);
+EXPORT void MIDPROC_Container_PromoteToType1(HMIDIContainer container);
+EXPORT void MIDPROC_Container_DetectLoops(HMIDIContainer container, bool detectXMILoops, bool detectMarkerLoops, bool detectRPGMakerLoops, bool detectTouhouLoops);
 
 // TODO: the rest
 #ifdef __cplusplus
