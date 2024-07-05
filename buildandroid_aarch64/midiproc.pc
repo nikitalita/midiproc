@@ -1,0 +1,11 @@
+prefix=/Users/andyvand/Library/Android/sdk/ndk/27.0.11902837/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr
+exec_prefix=/Users/andyvand/Library/Android/sdk/ndk/27.0.11902837/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr
+libdir=/Users/andyvand/Library/Android/sdk/ndk/27.0.11902837/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib
+includedir=/Users/andyvand/Library/Android/sdk/ndk/27.0.11902837/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/midiproc
+
+Name: midiproc
+Description: Midi processor
+Version: 
+Libs: -L${libdir} -lmidiproc
+Cflags: -I${includedir}
+

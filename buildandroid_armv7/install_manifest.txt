@@ -1,0 +1,11 @@
+/Users/andyvand/Library/Android/sdk/ndk/27.0.11902837/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/libmidiproc.a
+/Users/andyvand/Library/Android/sdk/ndk/27.0.11902837/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/midiproc/midiproc.h
+/Users/andyvand/Library/Android/sdk/ndk/27.0.11902837/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/midiproc/MIDIContainer.h
+/Users/andyvand/Library/Android/sdk/ndk/27.0.11902837/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/midiproc/MIDIProcessor.h
+/Users/andyvand/Library/Android/sdk/ndk/27.0.11902837/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/midiproc/Range.h
+/Users/andyvand/Library/Android/sdk/ndk/27.0.11902837/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/cmake/midiproc/midiproc-targets.cmake
+/Users/andyvand/Library/Android/sdk/ndk/27.0.11902837/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/cmake/midiproc/midiproc-targets-release.cmake
+/Users/andyvand/Library/Android/sdk/ndk/27.0.11902837/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/cmake/midiproc/midiprocConfigVersion.cmake
+/Users/andyvand/Library/Android/sdk/ndk/27.0.11902837/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/cmake/midiproc/midiprocConfig.cmake
+/Users/andyvand/Library/Android/sdk/ndk/27.0.11902837/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/pkgconfig/midiproc.pc
+/Users/andyvand/Library/Android/sdk/ndk/27.0.11902837/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/share/midiproc/copyright

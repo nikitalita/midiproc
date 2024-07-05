@@ -1,0 +1,1 @@
+/Users/andyvand/Library/Android/sdk/ndk/27.0.11902837/toolchains/llvm/prebuilt/darwin-x86_64/bin/i686-linux-android31-clang++ -O3 -DNDEBUG CMakeFiles/test.dir/test/test_midiproc.c.o -o test  libmidiproc.a 
