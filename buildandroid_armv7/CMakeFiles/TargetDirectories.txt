@@ -1,8 +1,0 @@
-/Users/andyvand/Downloads/midiproc-AnV/buildandroid_armv7/CMakeFiles/midiproc.dir
-/Users/andyvand/Downloads/midiproc-AnV/buildandroid_armv7/CMakeFiles/test.dir
-/Users/andyvand/Downloads/midiproc-AnV/buildandroid_armv7/CMakeFiles/edit_cache.dir
-/Users/andyvand/Downloads/midiproc-AnV/buildandroid_armv7/CMakeFiles/rebuild_cache.dir
-/Users/andyvand/Downloads/midiproc-AnV/buildandroid_armv7/CMakeFiles/list_install_components.dir
-/Users/andyvand/Downloads/midiproc-AnV/buildandroid_armv7/CMakeFiles/install.dir
-/Users/andyvand/Downloads/midiproc-AnV/buildandroid_armv7/CMakeFiles/install/local.dir
-/Users/andyvand/Downloads/midiproc-AnV/buildandroid_armv7/CMakeFiles/install/strip.dir
