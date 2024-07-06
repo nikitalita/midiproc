@@ -2,9 +2,10 @@
 /** $VER: MIDIContainer.cpp (2023.12.24) **/
 
 #include "MIDIContainer.h"
-#include "common_compat.h"
-#include "string_compat.h"
-#include "print_compat.h"
+
+#include "../compat/common_compat.h"
+#include "../compat/string_compat.h"
+#include "../compat/print_compat.h"
 
 #pragma warning(disable: 4242)
 #include <algorithm>
@@ -1390,7 +1391,7 @@ void MIDIContainer::SplitByInstrumentChanges(SplitCallback callback)
     }
 }
 
-#include "os_compat.h"
+#include "../compat/os_compat.h"
 
 void MIDIContainer::DetectLoops(bool detectXMILoops, bool detectMarkerLoops, bool detectRPGMakerLoops, bool detectTouhouLoops)
 {

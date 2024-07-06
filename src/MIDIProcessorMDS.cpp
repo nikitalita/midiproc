@@ -1,6 +1,7 @@
 
 /** $VER: MIDIProcessorMDS.cpp (2023.08.14) MIDI Stream. created by Microsoft with the release of Windows 95 (http://www.vgmpf.com/Wiki/index.php?title=MDS) **/
-#include "common_compat.h"
+#include "../compat/common_compat.h"
+
 #include "MIDIProcessor.h"
 
 bool MIDIProcessor::IsMDS(std::vector<uint8_t> const & data)

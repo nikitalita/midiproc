@@ -1,9 +1,9 @@
 
 /** $VER: MIDIProcessorSMF.cpp (2023.11.01) Standard MIDI File **/
-
 #include "MIDIProcessor.h"
-#include "common_compat.h"
-#include "string_compat.h"
+
+#include "../compat/common_compat.h"
+#include "../compat/string_compat.h"
 
   const uint8_t SysExUseForRhythmPartCh16[] = { 0xF0, 0x41, 0x10, 0x42, 0x12, 0x40, 0x1F, 0x15, 0x02, 0x0A, 0xF7 }; // Use channel 16 for rhythm.
 

@@ -1,10 +1,10 @@
 
 /** $VER: MIDIProcessorRIFF.cpp (2023.08.14) **/
-
 #include "MIDIProcessor.h"
 
-#include "string_compat.h"
-#include "common_compat.h"
+#include "../compat/string_compat.h"
+#include "../compat/common_compat.h"
+
 static inline uint32_t toInt32LE(const uint8_t * data)
 {
     return static_cast<uint32_t>(data[0]) | static_cast<uint32_t>(data[1] << 8) | static_cast<uint32_t>(data[2] << 16) | static_cast<uint32_t>(data[3] << 24);

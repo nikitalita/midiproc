@@ -7,10 +7,10 @@
 #include <linux/limits.h>
 #endif
 
-#include "common_compat.h"
-#include "os_compat.h"
-#include "string_compat.h"
-#include "print_compat.h"
+#include "../compat/common_compat.h"
+#include "../compat/os_compat.h"
+#include "../compat/string_compat.h"
+#include "../compat/print_compat.h"
 
 bool MIDIProcessor::IsRCP(std::vector<uint8_t> const & data, const char * fileExtension)
 {
