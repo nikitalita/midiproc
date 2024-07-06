@@ -10,7 +10,12 @@ set(MIDIPROC_TARGET_NAME_SHARED ${PROJECT_NAME}_shared)
 file(GLOB SOURCES "src/*.cpp" "compat/os_compat.c")
 
 add_library(${MIDIPROC_TARGET_NAME} ${SOURCES})
-add_library(${MIDIPROC_TARGET_NAME_SHARED} SHARED ${SOURCES})
+
+option(BUILD_SHARED "Build shared library" OFF)
+if (BUILD_SHARED)
+    add_library(${MIDIPROC_TARGET_NAME_SHARED} SHARED ${SOURCES})
+endif()
+
 target_include_directories(${MIDIPROC_TARGET_NAME} PRIVATE compat)
 
 add_executable(test test/test_midiproc.c)
