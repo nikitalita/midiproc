@@ -8,7 +8,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32)
 #define EXPORT __declspec(dllexport)
 #elif defined(__GNUC__) && (__GNUC__ >= 4)
 #define EXPORT __attribute__((visibility("default")))
