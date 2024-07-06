@@ -1,6 +1,7 @@
+#ifndef __RANGE_H__
+#define __RANGE_H__
 
 /** $VER: Range.h (2023.11.01) P. Stuer **/
-
 #pragma once
 
 #include <stdint.h>
@@ -41,3 +42,5 @@ private:
     uint32_t _Begin;
     uint32_t _End;
 };
+
+#endif /* __RANGE_H__ */

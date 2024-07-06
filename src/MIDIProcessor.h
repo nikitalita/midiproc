@@ -1,3 +1,5 @@
+#ifndef __MIDIPROCESSOR_H__
+#define __MIDIPROCESSOR_H__
 
 /** $VER: MIDIProcessor.h (2024.05.05) **/
 
@@ -103,3 +105,5 @@ private:
 
     static const uint8_t DefaultTempoLDS[5];
 };
+
+#endif /* __MIDIPROCESSOR_H__ */

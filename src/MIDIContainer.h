@@ -1,6 +1,7 @@
+#ifndef __MIDICONTAINER_H__
+#define __MIDICONTAINER_H__
 
 /** $VER: MIDIContainer.h (2024.05.07) **/
-
 #pragma once
 
 #pragma warning(disable: 4514) // Unreferenced inline function has been removed
@@ -428,3 +429,5 @@ private:
 
     std::vector<Range> _Loop;
 };
+
+#endif /* __MIDICONTAINER_H__ */
