@@ -214,7 +214,7 @@ void MIDIMetaData::AssignBitmap(std::vector<uint8_t>::const_iterator const & beg
     _Bitmap.assign(begin, end);
 }
 
-std::size_t MIDIMetaData::GetCount() const
+std::size_t MIDIMetaData::GetCount(void) const
 {
     return _Items.size();
 }
@@ -766,7 +766,7 @@ void MIDIContainer::SerializeAsSMF(std::vector<uint8_t> & midiStream) const
     }
 }
 
-void MIDIContainer::PromoteToType1()
+void MIDIContainer::PromoteToType1(void)
 {
     if (_Format != 0)
         return;
@@ -821,7 +821,7 @@ void MIDIContainer::PromoteToType1()
     _Format = 1;
 }
 
-size_t MIDIContainer::GetSubSongCount() const
+size_t MIDIContainer::GetSubSongCount(void) const
 {
     size_t SubSongCount = 0;
 
@@ -866,12 +866,12 @@ uint32_t MIDIContainer::GetDuration(size_t subSongIndex, bool ms /* = false */) 
     return ms ? TimestampToMS(Timestamp, SubSongIndex) : Timestamp;
 }
 
-uint32_t MIDIContainer::GetFormat() const
+uint32_t MIDIContainer::GetFormat(void) const
 {
     return _Format;
 }
 
-uint32_t MIDIContainer::GetTrackCount() const
+uint32_t MIDIContainer::GetTrackCount(void) const
 {
     return (uint32_t) _Tracks.size();
 }
@@ -1203,7 +1203,7 @@ void MIDIContainer::GetMetaData(size_t subSongIndex, MIDIMetaData & metaData)
     metaData.Append(_ExtraMetaData);
 }
 
-void MIDIContainer::TrimStart()
+void MIDIContainer::TrimStart(void)
 {
     if (_Format == 2)
     {

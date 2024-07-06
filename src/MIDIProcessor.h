@@ -45,7 +45,7 @@ class MIDIProcessor
 public:
     static bool Process(std::vector<uint8_t> const & data, const char * fileExtension, MIDIContainer & container);
 
-    static MIDIError GetLastErrorCode() noexcept { return _ErrorCode; }
+    static MIDIError GetLastErrorCode(void) noexcept { return _ErrorCode; }
 
 private:
     static int      DecodeVariableLengthQuantity   (std::vector<uint8_t>::const_iterator & it, std::vector<uint8_t>::const_iterator end) noexcept;

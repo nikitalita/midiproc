@@ -97,7 +97,7 @@ struct MIDIEvent
     uint32_t ChannelNumber;
     std::vector<uint8_t> Data;
 
-    MIDIEvent() noexcept : Timestamp(0), Type(EventType::NoteOff), ChannelNumber(0) { }
+    MIDIEvent(void) noexcept : Timestamp(0), Type(EventType::NoteOff), ChannelNumber(0) { }
     MIDIEvent(const MIDIEvent & midiEvent);
     MIDIEvent(uint32_t timestamp, EventType eventType, uint32_t channel, const uint8_t * data, size_t size);
 };
@@ -105,7 +105,7 @@ struct MIDIEvent
 class MIDITrack
 {
 public:
-    MIDITrack() noexcept { }
+    MIDITrack(void) noexcept { }
 
     MIDITrack(const MIDITrack & track) noexcept
     {
@@ -122,7 +122,7 @@ public:
     void AddEvent(const MIDIEvent & event);
     void RemoveEvent(size_t index);
 
-    size_t GetLength() const noexcept
+    size_t GetLength(void) const noexcept
     {
         return _Events.size();
     }
@@ -142,13 +142,13 @@ public:
     using iterator = midievents_t::iterator;
     using const_iterator = midievents_t::const_iterator;
 
-    iterator begin() { return _Events.begin(); }
-    iterator end() { return _Events.end(); }
+    iterator begin(void) { return _Events.begin(); }
+    iterator end(void) { return _Events.end(); }
 
-    const_iterator begin() const { return _Events.begin(); }
-    const_iterator end() const { return _Events.end(); }
-    const_iterator cbegin() const { return _Events.cbegin(); }
-    const_iterator cend() const { return _Events.cend(); }
+    const_iterator begin(void) const { return _Events.begin(); }
+    const_iterator end(void) const { return _Events.end(); }
+    const_iterator cbegin(void) const { return _Events.cbegin(); }
+    const_iterator cend(void) const { return _Events.cend(); }
 
 private:
     std::vector<MIDIEvent> _Events;
@@ -159,7 +159,7 @@ struct TempoItem
     uint32_t Timestamp;
     uint32_t Tempo;
 
-    TempoItem() noexcept : Timestamp(0), Tempo(0)
+    TempoItem(void) noexcept : Timestamp(0), Tempo(0)
     {
     }
 
@@ -172,7 +172,7 @@ public:
     void Add(uint32_t tempo, uint32_t timestamp);
     uint32_t TimestampToMS(uint32_t timestamp, uint32_t division) const;
 
-    size_t Size() const
+    size_t Size(void) const
     {
         return _Items.size();
     }
@@ -197,7 +197,7 @@ struct SysExItem
     size_t Size;
     uint8_t PortNumber;
 
-    SysExItem() noexcept : Offset(0), Size(0), PortNumber(0) { }
+    SysExItem(void) noexcept : Offset(0), Size(0), PortNumber(0) { }
     SysExItem(const SysExItem & src);
     SysExItem(uint8_t portNumber, std::size_t offset, std::size_t size);
 };
@@ -208,7 +208,7 @@ public:
     size_t AddItem(const uint8_t * data, std::size_t size, uint8_t portNumber);
     bool GetItem(size_t index, const uint8_t * & data, std::size_t & size, uint8_t & portNumber) const;
 
-    size_t Size() const
+    size_t Size(void) const
     {
         return _Items.size();
     }
@@ -223,7 +223,7 @@ struct MIDIStreamEvent
     uint32_t Timestamp; // in ms
     uint32_t Data;
 
-    MIDIStreamEvent() noexcept : Timestamp(0), Data(0)
+    MIDIStreamEvent(void) noexcept : Timestamp(0), Data(0)
     {
     }
 
@@ -240,7 +240,7 @@ struct MIDIMetaDataItem
     std::string Name;
     std::string Value;
 
-    MIDIMetaDataItem() noexcept : Timestamp(0) { }
+    MIDIMetaDataItem(void) noexcept : Timestamp(0) { }
 
     MIDIMetaDataItem(const MIDIMetaDataItem & item) noexcept { operator=(item); };
     MIDIMetaDataItem & operator=(const MIDIMetaDataItem & other) noexcept
@@ -262,7 +262,7 @@ struct MIDIMetaDataItem
         return *this;
     }
 
-    virtual ~MIDIMetaDataItem() { }
+    virtual ~MIDIMetaDataItem(void) { }
 
     MIDIMetaDataItem(uint32_t timestamp, const char * name, const char * value) noexcept
     {
@@ -275,14 +275,14 @@ struct MIDIMetaDataItem
 class MIDIMetaData
 {
 public:
-    MIDIMetaData() noexcept { }
+    MIDIMetaData(void) noexcept { }
 
     void AddItem(const MIDIMetaDataItem & item);
     void Append(const MIDIMetaData & data);
     bool GetItem(const char * name, MIDIMetaDataItem & item) const;
     bool GetBitmap(std::vector<uint8_t> & bitmap) const;
     void AssignBitmap(std::vector<uint8_t>::const_iterator const & begin, std::vector<uint8_t>::const_iterator const & end);
-    std::size_t GetCount() const;
+    std::size_t GetCount(void) const;
 
     const MIDIMetaDataItem & operator[](size_t index) const;
 
@@ -294,7 +294,7 @@ private:
 class MIDIContainer
 {
 public:
-    MIDIContainer() : _Format(0), _TimeDivision(0), _ExtraPercussionChannel(~0u)
+    MIDIContainer(void) : _Format(0), _TimeDivision(0), _ExtraPercussionChannel(~0u)
     {
         _DeviceNames.resize(16);
     }
@@ -314,32 +314,32 @@ public:
     void SerializeAsStream(size_t subSongIndex, std::vector<MIDIStreamEvent> & stream, SysExTable & sysExTable, uint32_t & loopBegin, uint32_t & loopEnd, uint32_t cleanFlags) const;
     void SerializeAsSMF(std::vector<uint8_t> & data) const;
 
-    void PromoteToType1();
+    void PromoteToType1(void);
 
-    void TrimStart();
+    void TrimStart(void);
 
     typedef std::string(* SplitCallback)(uint8_t bank_msb, uint8_t bank_lsb, uint8_t instrument);
 
     void SplitByInstrumentChanges(SplitCallback callback = nullptr);
 
-    size_t GetSubSongCount() const;
+    size_t GetSubSongCount(void) const;
     size_t GetSubSong(size_t index) const;
 
     uint32_t GetDuration(size_t subsongIndex, bool ms = false) const;
 
-    uint32_t GetFormat() const;
-    uint32_t GetTrackCount() const;
+    uint32_t GetFormat(void) const;
+    uint32_t GetTrackCount(void) const;
     uint32_t GetChannelCount(size_t subSongIndex) const;
 
     uint32_t GetLoopBeginTimestamp(size_t subSongIndex, bool ms = false) const;
     uint32_t GetLoopEndTimestamp(size_t subSongIndex, bool ms = false) const;
 
-    std::vector<MIDITrack> & GetTracks() { return _Tracks; }
+    std::vector<MIDITrack> & GetTracks(void) { return _Tracks; }
 
     void GetMetaData(size_t subSongIndex, MIDIMetaData & data);
 
     void SetExtraPercussionChannel(uint32_t channelNumber) noexcept { _ExtraPercussionChannel = channelNumber; }
-    uint32_t GetExtraPercussionChannel() const noexcept { return _ExtraPercussionChannel; }
+    uint32_t GetExtraPercussionChannel(void) const noexcept { return _ExtraPercussionChannel; }
 
     void DetectLoops(bool detectXMILoops, bool detectMarkerLoops, bool detectRPGMakerLoops, bool detectTouhouLoops);
 
@@ -350,13 +350,13 @@ public:
     using iterator = miditracks_t::iterator;
     using const_iterator = miditracks_t::const_iterator;
 
-    iterator begin() { return _Tracks.begin(); }
-    iterator end() { return _Tracks.end(); }
+    iterator begin(void) { return _Tracks.begin(); }
+    iterator end(void) { return _Tracks.end(); }
 
-    const_iterator begin() const { return _Tracks.begin(); }
-    const_iterator end() const { return _Tracks.end(); }
-    const_iterator cbegin() const { return _Tracks.cbegin(); }
-    const_iterator cend() const { return _Tracks.cend(); }
+    const_iterator begin(void) const { return _Tracks.begin(); }
+    const_iterator end(void) const { return _Tracks.end(); }
+    const_iterator cbegin(void) const { return _Tracks.cbegin(); }
+    const_iterator cend(void) const { return _Tracks.cend(); }
 
 public:
     enum
