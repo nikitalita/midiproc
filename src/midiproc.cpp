@@ -2,7 +2,7 @@
 #include "MIDIContainer.h"
 #include "midiproc.h"
 
-EXPORT size_t MIDPROC_process_and_serialize_to_smf(const uint8_t * data, size_t data_size, const char * file_extension, uint8_t ** data_out)
+EXPORT size_t MIDPROC_process_and_serialize_to_smf(const uint8_t *data, size_t data_size, const char *file_extension, uint8_t **data_out)
 {
     // convert the data to a vector
     std::vector<uint8_t> data_vector(data, data + data_size);
@@ -38,7 +38,7 @@ EXPORT void MIDPROC_Container_Delete(HMIDIContainer processor)
     delete container;
 }
 
-EXPORT bool MIDPROC_Process(const uint8_t * data, size_t data_size, const char * file_extension, HMIDIContainer container)
+EXPORT bool MIDPROC_Process(const uint8_t *data, size_t data_size, const char *file_extension, HMIDIContainer container)
 {
     std::vector<uint8_t> data_vector(data, data + data_size);
     if (!MIDIProcessor::Process(data_vector, file_extension, *container)){
@@ -47,7 +47,7 @@ EXPORT bool MIDPROC_Process(const uint8_t * data, size_t data_size, const char *
     return true;
 }
 
-EXPORT void MIDPROC_Container_SerializeAsSMF(HMIDIContainer container, uint8_t ** data_out, size_t * data_out_size)
+EXPORT void MIDPROC_Container_SerializeAsSMF(HMIDIContainer container, uint8_t **data_out, size_t * data_out_size)
 {
     MIDIContainer * c = static_cast<MIDIContainer *>(container);
     std::vector<uint8_t> * serialized_container = new std::vector<uint8_t>();
@@ -87,6 +87,7 @@ EXPORT uint32_t MIDPROC_Container_GetLoopEndTimestamp(HMIDIContainer container, 
     MIDIContainer * c = static_cast<MIDIContainer *>(container);
     return c->GetLoopEndTimestamp(subSongIndex, ms);
 }
+
 EXPORT uint32_t MIDPROC_Container_GetDuration(HMIDIContainer container, size_t subSongIndex, bool ms)
 {
     MIDIContainer * c = static_cast<MIDIContainer *>(container);
