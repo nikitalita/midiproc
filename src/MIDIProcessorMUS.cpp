@@ -47,7 +47,7 @@ bool MIDIProcessor::ProcessMUS(std::vector<uint8_t> const & data, MIDIContainer 
 
     uint8_t VelocityLevels[16] = { 0 };
 
-    auto it = data.begin() + Offset, end = data.begin() + Offset + Length;
+    std::vector<uint8_t>::const_iterator it = data.begin() + Offset, end = data.begin() + Offset + Length;
 
     uint8_t Data[4];
 

@@ -169,7 +169,7 @@ static bool ReadChunk(std::vector<uint8_t>::const_iterator & it, std::vector<uin
             return false;
 
         // Read the sub-chunks of a FORM or CAT chunk.
-        auto ChunkEnd = it + (int) ChunkSize;
+        std::vector<uint8_t>::const_iterator ChunkEnd = it + (int) ChunkSize;
 
         std::copy(it, it + 4, (uint8_t *) &chunk.Type);
         it += 4;
@@ -216,7 +216,7 @@ static bool ReadChunk(std::vector<uint8_t>::const_iterator & it, std::vector<uin
 /// </summary>
 static bool ReadStream(std::vector<uint8_t> const & data, IFFStream & stream)
 {
-    auto it = data.begin(), end = data.end();
+    std::vector<uint8_t>::const_iterator it = data.begin(), end = data.end();
 
     bool IsFirstChunk = true;
 
@@ -317,7 +317,7 @@ bool MIDIProcessor::ProcessXMI(std::vector<uint8_t> const & data, MIDIContainer 
 
             std::vector<uint8_t> Temp(3);
 
-            auto it = Data.begin(), end = Data.end();
+            std::vector<uint8_t>::const_iterator it = Data.begin(), end = Data.end();
 
             while (it != end)
             {

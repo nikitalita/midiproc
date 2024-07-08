@@ -35,7 +35,7 @@ MIDIEvent::MIDIEvent(uint32_t timestamp, EventType eventType, uint32_t channelNu
 
 void MIDITrack::AddEvent(const MIDIEvent & newEvent)
 {
-    auto it = _Events.end();
+    std::vector<MIDIEvent>::iterator it = _Events.end();
 
     if (_Events.size() > 0)
     {
@@ -77,7 +77,7 @@ TempoItem::TempoItem(uint32_t timestamp, uint32_t tempo)
 
 void TempoMap::Add(uint32_t tempo, uint32_t timestamp)
 {
-    auto it = _Items.end();
+    std::vector<TempoItem>::iterator it = _Items.end();
 
     while (it > _Items.begin())
     {
@@ -100,7 +100,7 @@ uint32_t TempoMap::TimestampToMS(uint32_t p_timestamp, uint32_t division) const
 {
     uint32_t TimestampInMS = 0;
 
-    auto Iterator = _Items.begin();
+    std::vector<const TempoItem>::iterator Iterator = _Items.begin();
 
     uint32_t Tempo = 500000;
 
@@ -144,7 +144,7 @@ SysExItem::SysExItem(uint8_t portNumber, std::size_t offset, std::size_t size)
 
 size_t SysExTable::AddItem(const uint8_t * data, std::size_t size, uint8_t portNumber)
 {
-    for (auto it = _Items.begin(); it < _Items.end(); ++it)
+    for (std::vector<SysExItem>::iterator it = _Items.begin(); it < _Items.end(); ++it)
     {
         const SysExItem & Item = *it;
 

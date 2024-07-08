@@ -28,8 +28,8 @@ bool MIDIProcessor::ProcessHMP(std::vector<uint8_t> const & data, MIDIContainer 
     if (Offset >= data.size())
         return false;
 
-    auto it = data.begin() + (int) Offset;
-    auto end = data.end();
+    std::vector<uint8_t>::const_iterator it = data.begin() + (int) Offset;
+    std::vector<uint8_t>::const_iterator end = data.end();
 
     track_count_8 = *it;
 
@@ -134,7 +134,7 @@ bool MIDIProcessor::ProcessHMP(std::vector<uint8_t> const & data, MIDIContainer 
 
         std::vector<uint8_t> Temp(3);
 
-        auto TrackDataEnd = it + (int) track_size_32;
+        std::vector<uint8_t>::const_iterator TrackDataEnd = it + (int) track_size_32;
 
         while (it != TrackDataEnd)
         {

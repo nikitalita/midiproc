@@ -53,7 +53,7 @@ bool MIDIProcessor::ProcessGMF(std::vector<uint8_t> const & data, MIDIContainer 
 
     container.AddTrack(Track);
 
-    auto it = data.begin() + 7;
+    std::vector<uint8_t>::const_iterator it = data.begin() + 7;
 
     return ProcessSMFTrack(it, data.end(), container, false);
 }

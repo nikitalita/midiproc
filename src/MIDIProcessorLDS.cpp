@@ -360,8 +360,8 @@ bool MIDIProcessor::ProcessLDS(std::vector<uint8_t> const & data, MIDIContainer 
 
     uint16_t PatchCount;
 
-    auto it  = data.begin();
-    auto end = data.end();
+    std::vector<uint8_t>::const_iterator it  = data.begin();
+    std::vector<uint8_t>::const_iterator end = data.end();
 
     if (end == it)
         return false;
