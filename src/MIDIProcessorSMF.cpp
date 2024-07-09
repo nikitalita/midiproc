@@ -10,60 +10,60 @@
 bool MIDIProcessor::IsSMF(std::vector<uint8_t> const & data)
 {
     if (data.size() < 18)
-        return SetLastErrorCode(MIDIError::InsufficientData);
+        return SetLastErrorCode(InsufficientData);
 
     if (::memcmp(&data[0], "MThd", 4) != 0)
-        return SetLastErrorCode(MIDIError::SMFBadHeaderChunkType);
+        return SetLastErrorCode(SMFBadHeaderChunkType);
 
     if (data[4] != 0 || data[5] != 0 || data[6] != 0 || data[7] != 6)
-        return SetLastErrorCode(MIDIError::SMFBadHeaderChunkSize);
+        return SetLastErrorCode(SMFBadHeaderChunkSize);
 
     int Format = (data[8] << 8) | data[9];
 
     if (Format > 2)
-        return SetLastErrorCode(MIDIError::SMFBadHeaderFormat);
+        return SetLastErrorCode(SMFBadHeaderFormat);
 
     int TrackCount = (data[10] << 8) | data[11];
 
     if ((TrackCount == 0) || ((Format == 0) && (TrackCount != 1)))
-        return SetLastErrorCode(MIDIError::SMFBadHeaderTrackCount);
+        return SetLastErrorCode(SMFBadHeaderTrackCount);
 
     if (data[12] == 0 && data[13] == 0)
-        return SetLastErrorCode(MIDIError::SMFBadHeaderTimeDivision);
+        return SetLastErrorCode(SMFBadHeaderTimeDivision);
 
     if (::memcmp(&data[14], "MTrk", 4) != 0)
-        return SetLastErrorCode(MIDIError::SMFUnknownChunkType);
+        return SetLastErrorCode(SMFUnknownChunkType);
 
     return true;
 }
 
 bool MIDIProcessor::ProcessSMF(std::vector<uint8_t> const & data, MIDIContainer & container)
 {
-    SetLastErrorCode(MIDIError::None);
+    SetLastErrorCode(MENone);
 
     if (data.size() < 18)
-        return SetLastErrorCode(MIDIError::InsufficientData);
+        return SetLastErrorCode(InsufficientData);
 
     if (::memcmp(&data[0], "MThd", 4) != 0)
-        return SetLastErrorCode(MIDIError::SMFBadHeaderChunkType);
+        return SetLastErrorCode(SMFBadHeaderChunkType);
 
     if (data[4] != 0 || data[5] != 0 || data[6] != 0 || data[7] != 6)
-        return SetLastErrorCode(MIDIError::SMFBadHeaderChunkSize);
+        return SetLastErrorCode(SMFBadHeaderChunkSize);
 
     int Format = (data[8] << 8) | data[9];
 
     if (Format > 2)
-        return SetLastErrorCode(MIDIError::SMFBadHeaderFormat);
+        return SetLastErrorCode(SMFBadHeaderFormat);
 
     int TrackCount = (data[10] << 8) | data[11];
 
     if ((TrackCount == 0) || ((Format == 0) && (TrackCount != 1)))
-        return SetLastErrorCode(MIDIError::SMFBadHeaderTrackCount);
+        return SetLastErrorCode(SMFBadHeaderTrackCount);
 
     int TimeDivision = (data[12] << 8) | data[13];
 
     if (TimeDivision == 0)
-        return SetLastErrorCode(MIDIError::SMFBadHeaderTimeDivision);
+        return SetLastErrorCode(SMFBadHeaderTimeDivision);
 
     container.Initialize((uint32_t) Format, (uint32_t) TimeDivision);
 
@@ -73,14 +73,14 @@ bool MIDIProcessor::ProcessSMF(std::vector<uint8_t> const & data, MIDIContainer 
     for (int i = 0; i < TrackCount; ++i)
     {
         if (Tail - Data < 8)
-            return SetLastErrorCode(MIDIError::InsufficientData);
+            return SetLastErrorCode(InsufficientData);
 
         uint32_t ChunkSize = (uint32_t)((Data[4] << 24) | (Data[5] << 16) | (Data[6] << 8) | Data[7]);
 
         if (::memcmp(&Data[0], "MTrk", 4) == 0)
         {
             if (Tail - Data < (std::ptrdiff_t) (8 + ChunkSize))
-                return SetLastErrorCode(MIDIError::InsufficientData);
+                return SetLastErrorCode(InsufficientData);
 
             Data += 8;
 
@@ -95,7 +95,7 @@ bool MIDIProcessor::ProcessSMF(std::vector<uint8_t> const & data, MIDIContainer 
         else
         {
             if (Tail - Data < (std::ptrdiff_t) (8 + ChunkSize))
-                return SetLastErrorCode(MIDIError::InsufficientData);
+                return SetLastErrorCode(InsufficientData);
 
             Data += (int64_t)(8) + ChunkSize;
 
@@ -128,7 +128,7 @@ bool MIDIProcessor::ProcessSMFTrack(std::vector<uint8_t>::const_iterator & data,
         int DeltaTime = DecodeVariableLengthQuantity(data, tail);
 
         if (data == tail)
-            return SetLastErrorCode(MIDIError::InsufficientData);
+            return SetLastErrorCode(InsufficientData);
 
         if (DeltaTime < 0)
             DeltaTime = -DeltaTime; // "Encountered negative delta: " << delta << "; flipping sign."
@@ -139,10 +139,10 @@ bool MIDIProcessor::ProcessSMFTrack(std::vector<uint8_t>::const_iterator & data,
 
         uint8_t StatusCode = *data++;
 
-        if (StatusCode < StatusCodes::NoteOff)
+        if (StatusCode < NoteOff)
         {
             if (LastStatusCode == 0xFF)
-                return SetLastErrorCode(MIDIError::SMFBadFirstMessage);
+                return SetLastErrorCode(SMFBadFirstMessage);
 
             Temp.resize(3);
 
@@ -151,23 +151,23 @@ bool MIDIProcessor::ProcessSMFTrack(std::vector<uint8_t>::const_iterator & data,
             StatusCode = LastStatusCode;
         }
 
-        if (StatusCode < StatusCodes::SysEx)
+        if (StatusCode < SysEx)
         {
             if (SysExSize > 0)
             {
-                Track.AddEvent(MIDIEvent(SysExTimestamp, MIDIEvent::Extended, 0, Temp.data(), SysExSize));
+                Track.AddEvent(MIDIEvent(SysExTimestamp, Extended, 0, (unsigned char *)(&Temp[0]/*.data()*/), SysExSize));
                 SysExSize = 0;
             }
 
             LastStatusCode = StatusCode;
 
-            if (!trackNeedsEndMarker && ((StatusCode & 0xF0) == StatusCodes::PitchBendChange))
+            if (!trackNeedsEndMarker && ((StatusCode & 0xF0) == PitchBendChange))
                 continue;
 
             if (BytesRead == 0)
             {
                 if (data == tail)
-                    return SetLastErrorCode(MIDIError::InsufficientData);
+                    return SetLastErrorCode(InsufficientData);
 
                 Temp.resize(3);
 
@@ -177,13 +177,13 @@ bool MIDIProcessor::ProcessSMFTrack(std::vector<uint8_t>::const_iterator & data,
 
             switch (StatusCode & 0xF0)
             {
-                case StatusCodes::ProgramChange:
-                case StatusCodes::ChannelPressureAftertouch:
+                case ProgramChange:
+                case ChannelPressureAftertouch:
                     break;
 
                 default:
                     if (data == tail)
-                        return SetLastErrorCode(MIDIError::InsufficientData);
+                        return SetLastErrorCode(InsufficientData);
 
                     Temp[BytesRead++] = *data++;
             }
@@ -195,7 +195,7 @@ bool MIDIProcessor::ProcessSMFTrack(std::vector<uint8_t>::const_iterator & data,
 
                 if ((ChannelNumber == 0x0F) && DetectedPercussionText)
                 {
-                    Track.AddEvent(MIDIEvent(0, MIDIEvent::Extended, 0, SysExUseForRhythmPartCh16, _countof(SysExUseForRhythmPartCh16)));
+                    Track.AddEvent(MIDIEvent(0, Extended, 0, SysExUseForRhythmPartCh16, _countof(SysExUseForRhythmPartCh16)));
 
                     container.SetExtraPercussionChannel(ChannelNumber);
 
@@ -203,29 +203,29 @@ bool MIDIProcessor::ProcessSMFTrack(std::vector<uint8_t>::const_iterator & data,
                 }
             }
 
-            Track.AddEvent(MIDIEvent(Timestamp, (MIDIEvent::EventType) ((StatusCode >> 4) - 8), ChannelNumber, Temp.data(), BytesRead));
+            Track.AddEvent(MIDIEvent(Timestamp, (EventType) ((StatusCode >> 4) - 8), ChannelNumber, (unsigned char *)(&Temp[0]/*.data()*/), BytesRead));
         }
         else
-        if (StatusCode == StatusCodes::SysEx)
+        if (StatusCode == SysEx)
         {
             if (SysExSize > 0)
             {
-                Track.AddEvent(MIDIEvent(SysExTimestamp, MIDIEvent::Extended, 0, Temp.data(), SysExSize));
+                Track.AddEvent(MIDIEvent(SysExTimestamp, Extended, 0, (unsigned char *)(&Temp[0]/*.data()*/), SysExSize));
                 SysExSize = 0;
             }
 
             int Size = DecodeVariableLengthQuantity(data, tail);
 
             if (Size < 0)
-                return SetLastErrorCode(MIDIError::InvalidSysExMessage);
+                return SetLastErrorCode(InvalidSysExMessage);
 
             if (Size > tail - data)
-                return SetLastErrorCode(MIDIError::InsufficientData);
+                return SetLastErrorCode(InsufficientData);
 
             {
                 Temp.resize((size_t) (Size + 1));
 
-                Temp[0] = StatusCodes::SysEx;
+                Temp[0] = SysEx;
 
                 std::copy(data, data + Size, Temp.begin() + 1);
                 data += Size;
@@ -235,19 +235,19 @@ bool MIDIProcessor::ProcessSMFTrack(std::vector<uint8_t>::const_iterator & data,
             }
         }
         else
-        if (StatusCode == StatusCodes::SysExEnd)
+        if (StatusCode == SysExEnd)
         {
             if (SysExSize == 0)
-                return SetLastErrorCode(MIDIError::InvalidSysExEndMessage);
+                return SetLastErrorCode(InvalidSysExEndMessage);
 
             // Add the SysEx continuation to the current SysEx message
             int Size = DecodeVariableLengthQuantity(data, tail);
 
             if (Size < 0)
-                return SetLastErrorCode(MIDIError::InvalidSysExMessageContinuation);
+                return SetLastErrorCode(InvalidSysExMessageContinuation);
 
             if (Size > tail - data)
-                return SetLastErrorCode(MIDIError::InsufficientData);
+                return SetLastErrorCode(InsufficientData);
 
             {
                 Temp.resize((size_t) SysExSize + Size);
@@ -259,32 +259,32 @@ bool MIDIProcessor::ProcessSMFTrack(std::vector<uint8_t>::const_iterator & data,
             }
         }
         else
-        if (StatusCode == StatusCodes::MetaData)
+        if (StatusCode == MetaData)
         {
             if (SysExSize > 0)
             {
-                Track.AddEvent(MIDIEvent(SysExTimestamp, MIDIEvent::Extended, 0, Temp.data(), SysExSize));
+                Track.AddEvent(MIDIEvent(SysExTimestamp, Extended, 0, (unsigned char *)(&Temp[0]/*.data()*/), SysExSize));
                 SysExSize = 0;
             }
 
             if (data == tail)
-                return SetLastErrorCode(MIDIError::InvalidMetaDataMessage);
+                return SetLastErrorCode(InvalidMetaDataMessage);
 
             uint8_t MetaDataType = *data++;
 
-            if (MetaDataType > MetaDataTypes::SequencerSpecific)
-                return SetLastErrorCode(MIDIError::InvalidMetaDataMessage);
+            if (MetaDataType > SequencerSpecific)
+                return SetLastErrorCode(InvalidMetaDataMessage);
 
             int Size = DecodeVariableLengthQuantity(data, tail);
 
             if (Size < 0)
-                return SetLastErrorCode(MIDIError::InvalidMetaDataMessage);
+                return SetLastErrorCode(InvalidMetaDataMessage);
 
             if (Size > tail - data)
-                return SetLastErrorCode(MIDIError::InsufficientData);
+                return SetLastErrorCode(InsufficientData);
 
             // Remember when the track or instrument name contains the word "drum". We'll need it later.
-            if ((MetaDataType == MetaDataTypes::Text) || (MetaDataType == MetaDataTypes::TrackName) || (MetaDataType == MetaDataTypes::InstrumentName))
+            if ((MetaDataType == TextE) || (MetaDataType == TrackName) || (MetaDataType == InstrumentName))
             {
                 const char * p = (const char *) &data[0];
 
@@ -301,15 +301,15 @@ bool MIDIProcessor::ProcessSMFTrack(std::vector<uint8_t>::const_iterator & data,
             {
                 Temp.resize((size_t)(Size + 2));
 
-                Temp[0] = StatusCodes::MetaData;
+                Temp[0] = MetaData;
                 Temp[1] = MetaDataType;
 
                 std::copy(data, data + Size, Temp.begin() + 2);
                 data += Size;
 
-                Track.AddEvent(MIDIEvent(Timestamp, MIDIEvent::Extended, 0, Temp.data(), (size_t) (Size + 2)));
+                Track.AddEvent(MIDIEvent(Timestamp, Extended, 0, (unsigned char *)(&Temp[0]/*.data()*/), (size_t) (Size + 2)));
 
-                if (MetaDataType == MetaDataTypes::EndOfTrack) // Mandatory, Marks the end of the track.
+                if (MetaDataType == EndOfTrack) // Mandatory, Marks the end of the track.
                 {
                     trackNeedsEndMarker = true;
                     break;
@@ -317,22 +317,22 @@ bool MIDIProcessor::ProcessSMFTrack(std::vector<uint8_t>::const_iterator & data,
             }
         }
         else
-        if ((StatusCodes::SysExEnd < StatusCode) && (StatusCode < StatusCodes::MetaData)) // Sequencer specific events, single byte.
+        if ((SysExEnd < StatusCode) && (StatusCode < MetaData)) // Sequencer specific events, single byte.
         {
             Temp[0] = StatusCode;
 
-            Track.AddEvent(MIDIEvent(Timestamp, MIDIEvent::Extended, 0, Temp.data(), 1));
+            Track.AddEvent(MIDIEvent(Timestamp, Extended, 0, (unsigned char *)(&Temp[0]/*.data()*/), 1));
         }
         else
-            return SetLastErrorCode(MIDIError::UnknownStatusCode);
+            return SetLastErrorCode(UnknownStatusCode);
     }
 
     if (!trackNeedsEndMarker)
     {
-        Temp[0] = StatusCodes::MetaData;
-        Temp[1] = MetaDataTypes::EndOfTrack;
+        Temp[0] = MetaData;
+        Temp[1] = EndOfTrack;
 
-        Track.AddEvent(MIDIEvent(Timestamp, MIDIEvent::Extended, 0, Temp.data(), 2));
+        Track.AddEvent(MIDIEvent(Timestamp, Extended, 0, (unsigned char *)(&Temp[0]/*.data()*/), 2));
     }
 
     container.AddTrack(Track);

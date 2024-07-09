@@ -14,13 +14,13 @@
 
 bool MIDIProcessor::IsRCP(std::vector<uint8_t> const & data, const char * fileExtension)
 {
-    if (fileExtension == nullptr)
+    if (fileExtension == NULL)
         return false;
 
     if (data.size() < 28)
         return false;
 
-    if (::strncmp((const char *) data.data(), "RCM-PC98V2.0(C)COME ON MUSIC", 28) == 0)
+    if (::strncmp((const char *)(&data[0]/*.data()*/), "RCM-PC98V2.0(C)COME ON MUSIC", 28) == 0)
     {
         if (::_stricmp(fileExtension, "rcp") == 0)
             return true;
@@ -34,7 +34,7 @@ bool MIDIProcessor::IsRCP(std::vector<uint8_t> const & data, const char * fileEx
     if (data.size() < 31)
         return false;
 
-    if (::strncmp((const char *) data.data(), "COME ON MUSIC RECOMPOSER RCP3.0", 31) == 0)
+    if (::strncmp((const char *)(&data[0]/*.data()*/), "COME ON MUSIC RECOMPOSER RCP3.0", 31) == 0)
     {
         if (::_stricmp(fileExtension, "g18") == 0)
             return true;
@@ -55,7 +55,7 @@ bool MIDIProcessor::ProcessRCP(std::vector<uint8_t> const & data, MIDIContainer 
 
     const size_t RCP_MAXCHANNELS = 32;
 
-    const uint8_t * Data = data.data();
+    const uint8_t * Data = (const uint8_t *)(&data[0]/*.data()*/);
 
     size_t Offset = 32; // Skip past the file identifier
 
@@ -88,8 +88,10 @@ bool MIDIProcessor::ProcessRCP(std::vector<uint8_t> const & data, MIDIContainer 
 
     uint8_t key = Data[0x01C4]; // Key signature
 
-    if (key < 0 || key >= 32)
+    if ((((int8_t)key) < 0) || (key >= 32))
+	{
         key = 0;
+	}
 
     int playBias = (int8_t) Data[0x01C5];
 
@@ -147,7 +149,7 @@ bool MIDIProcessor::ProcessRCP(std::vector<uint8_t> const & data, MIDIContainer 
         uint32_t Timestamp = 0;
 
         {
-            Data = data.data() + Offset;
+            Data = &data[Offset]/*.data() + Offset*/;
 
             // Terminate the loop if the footer data is found.
             if ((Data[0] == 'R') && (Data[1] == 'C') && (Data[2] == 'F') && (Data[3] == 'W'))
@@ -219,9 +221,9 @@ bool MIDIProcessor::ProcessRCP(std::vector<uint8_t> const & data, MIDIContainer 
         }
 
         {
-            const uint8_t EventData[] = { StatusCodes::MetaData, MetaDataTypes::EndOfTrack };
+            const uint8_t EventData[] = { MetaData, EndOfTrack };
 
-            Track.AddEvent(MIDIEvent(Timestamp, MIDIEvent::Extended, 0, EventData, _countof(EventData)));
+            Track.AddEvent(MIDIEvent(Timestamp, Extended, 0, EventData, _countof(EventData)));
 
             container.AddTrack(Track);
         }

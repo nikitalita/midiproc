@@ -6,6 +6,10 @@
 
 #include <stdint.h>
 
+#ifndef noexcept
+#define noexcept
+#endif
+
 /// <summary>
 /// Represents a range.
 /// </summary>
@@ -14,10 +18,10 @@ class Range
 public:
     Range(void) noexcept { Clear(); }
 
-    Range(const Range &) = delete;
-    Range(Range && other) noexcept { Set(other._Begin, other._End); }
-    Range & operator=(const Range &) = delete;
-    Range & operator=(Range && other) noexcept { Set(other._Begin, other._End); return *this; }
+    Range(const Range & other) { Set(other._Begin, other._End); }
+    Range(Range & other) noexcept { Set(other._Begin, other._End); }
+    Range & operator=(const Range & other) { Set(other._Begin, other._End); return *this; }
+    Range & operator=(Range & other) noexcept { Set(other._Begin, other._End); return *this; }
 
     virtual ~Range(void) noexcept { }
 

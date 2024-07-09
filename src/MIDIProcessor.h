@@ -7,9 +7,13 @@
 
 #include "MIDIContainer.h"
 
-enum MIDIError
+#ifndef noexcept
+#define noexcept
+#endif
+
+typedef enum MIDIError
 {
-    None = 0,
+    MENone = 0,
 
     UnknownStatusCode,                  // Unknown MIDI status code
 
@@ -38,7 +42,7 @@ enum MIDIError
     XMIFORMXMIDNotFound,                // FORM XMID chunk not found
     XMIEVNTChunkNotFound,               // EVNT chunk not found
     XMIInvalidNoteMessage,              // Invalid note message
-};
+} MIDIError;
 
 class MIDIProcessor
 {

@@ -15,7 +15,11 @@
 
 #include "Range.h"
 
-enum StatusCodes
+#ifndef noexcept
+#define noexcept
+#endif
+
+typedef enum StatusCodes
 {
     NoteOff = 0x80,
     NoteOn = 0x90,
@@ -41,19 +45,19 @@ enum StatusCodes
 
     ActiveSensing = 0xFE,
     MetaData = 0xFF
-};
+} StatusCodes;
 
-enum ControlChangeNumbers
+typedef enum ControlChangeNumbers
 {
     BankSelect = 0x00,
 
     LSB = 0x20,                 // LSB for Control Changes 0 to 31
-};
+} ControlChangeNumbers;
 
-enum MetaDataTypes
+typedef enum MetaDataTypes
 {
     SequenceNumber = 0x00,      // Sequence number in type 0 and 1 MIDI files; pattern number in type 2 MIDI files. (0..65535, default 0, occurs at delta time 0)
-    Text = 0x01,                // General "Text" Meta Message. Can be used for any text based data. (string)
+    TextE = 0x01,                // General "Text" Meta Message. Can be used for any text based data. (string)
     Copyright = 0x02,           // Provides information about a MIDI file’s copyright. (string, occurs at delta time 0 in the first track)
     TrackName = 0x03,           // Track name (string, occurs at delta time 0)
     InstrumentName = 0x04,      // Instrument name (string)
@@ -61,7 +65,7 @@ enum MetaDataTypes
     Marker = 0x06,              // Marks a point of interest in a MIDI file. Can be used as the marker for the beginning of a verse, solo, etc. (string)
     CueMarker = 0x07,           // Marks a cue. IE: ‘Cue performer 1’, etc (string)
 
-    DeviceName = 0x09,          // Gives the name of the device. (string)
+    DeviceNameE = 0x09,          // Gives the name of the device. (string)
 
     ChannelPrefix = 0x20,       // Gives the prefix for the channel on which events are played. (0..255, default 0)
     MIDIPort = 0x21,            // Gives the MIDI Port on which events are played. (0..255, default 0)
@@ -76,28 +80,28 @@ enum MetaDataTypes
     KeySignature = 0x59,        // Valid values: A A#m Ab Abm Am B Bb Bbm Bm C C# C#m Cb Cm D D#m Db Dm E Eb Ebm Em F F# F#m Fm G G#m Gb Gm
 
     SequencerSpecific = 0x7F    // An unprocessed sequencer specific message containing raw data.
-};
+} MetaDataTypes;
+
+typedef enum EventType
+{
+	NoteOffE = 0,                // x080
+	NoteOnE,                     // x090
+	PolyphonicAftertouchE,       // x0A0
+	ControlChangeE,              // x0B0
+	ProgramChangeE,              // x0C0
+	ChannelPressureAftertouchE,  // x0D0
+	PitchBendChangeE,            // x0E0
+	Extended                    // x0F0
+} EventType;
 
 struct MIDIEvent
-{
-    enum EventType
-    {
-        NoteOff = 0,                // x080
-        NoteOn,                     // x090
-        PolyphonicAftertouch,       // x0A0
-        ControlChange,              // x0B0
-        ProgramChange,              // x0C0
-        ChannelPressureAftertouch,  // x0D0
-        PitchBendChange,            // x0E0
-        Extended                    // x0F0
-    };
-
+{	
     uint32_t Timestamp;
     EventType Type;
     uint32_t ChannelNumber;
     std::vector<uint8_t> Data;
 
-    MIDIEvent(void) noexcept : Timestamp(0), Type(EventType::NoteOff), ChannelNumber(0) { }
+    MIDIEvent(void) noexcept : Timestamp(0), Type(NoteOffE), ChannelNumber(0) { }
     MIDIEvent(const MIDIEvent & midiEvent);
     MIDIEvent(uint32_t timestamp, EventType eventType, uint32_t channel, const uint8_t * data, size_t size);
 };
@@ -138,17 +142,15 @@ public:
     }
 
 public:
-    using midievents_t = std::vector<MIDIEvent>;
-    using iterator = midievents_t::iterator;
-    using const_iterator = midievents_t::const_iterator;
+    std::vector<MIDIEvent>::iterator begin(void) { return _Events.begin(); }
+    std::vector<MIDIEvent>::iterator end(void) { return _Events.end(); }
 
-    iterator begin(void) { return _Events.begin(); }
-    iterator end(void) { return _Events.end(); }
-
-    const_iterator begin(void) const { return _Events.begin(); }
-    const_iterator end(void) const { return _Events.end(); }
-    const_iterator cbegin(void) const { return _Events.cbegin(); }
-    const_iterator cend(void) const { return _Events.cend(); }
+    std::vector<MIDIEvent>::const_iterator begin(void) const { return _Events.begin(); }
+    std::vector<MIDIEvent>::const_iterator end(void) const { return _Events.end(); }
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
+    std::vector<MIDIEvent>::const_iterator cbegin(void) const { return _Events.cbegin(); }
+    std::vector<MIDIEvent>::const_iterator cend(void) const { return _Events.cend(); }
+#endif
 
 private:
     std::vector<MIDIEvent> _Events;
@@ -242,7 +244,13 @@ struct MIDIMetaDataItem
 
     MIDIMetaDataItem(void) noexcept : Timestamp(0) { }
 
-    MIDIMetaDataItem(const MIDIMetaDataItem & item) noexcept { operator=(item); };
+    MIDIMetaDataItem(const MIDIMetaDataItem & item) noexcept
+	{
+		Timestamp = item.Timestamp;
+		Name = item.Name;
+		Value = item.Value;
+	}
+
     MIDIMetaDataItem & operator=(const MIDIMetaDataItem & other) noexcept
     {
         Timestamp = other.Timestamp;
@@ -252,12 +260,18 @@ struct MIDIMetaDataItem
         return *this;
     }
 
-    MIDIMetaDataItem(MIDIMetaDataItem && item) { operator=(item); }
-    MIDIMetaDataItem & operator=(MIDIMetaDataItem && other)
+    MIDIMetaDataItem(MIDIMetaDataItem & item) { operator=(item); }
+    MIDIMetaDataItem & operator=(MIDIMetaDataItem & other)
     {
         Timestamp = other.Timestamp;
+
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= 1060
+		Name = (Name);
+		Value = (Value);
+#else
         Name = std::move(Name);
         Value = std::move(Value);
+#endif
 
         return *this;
     }
@@ -281,8 +295,9 @@ public:
     void Append(const MIDIMetaData & data);
     bool GetItem(const char * name, MIDIMetaDataItem & item) const;
     bool GetBitmap(std::vector<uint8_t> & bitmap) const;
-    void AssignBitmap(std::vector<uint8_t>::const_iterator const & begin, std::vector<uint8_t>::const_iterator const & end);
-    std::size_t GetCount(void) const;
+
+	void AssignBitmap(std::vector<uint8_t>::const_iterator const begin, std::vector<uint8_t>::const_iterator const end);
+	std::size_t GetCount(void) const;
 
     const MIDIMetaDataItem & operator[](size_t index) const;
 
@@ -320,7 +335,7 @@ public:
 
     typedef std::string(* SplitCallback)(uint8_t bank_msb, uint8_t bank_lsb, uint8_t instrument);
 
-    void SplitByInstrumentChanges(SplitCallback callback = nullptr);
+    void SplitByInstrumentChanges(SplitCallback callback = NULL);
 
     size_t GetSubSongCount(void) const;
     size_t GetSubSong(size_t index) const;
@@ -346,17 +361,17 @@ public:
     static void EncodeVariableLengthQuantity(std::vector<uint8_t> & data, uint32_t delta);
 
 public:
-    using miditracks_t = std::vector<MIDITrack>;
-    using iterator = miditracks_t::iterator;
-    using const_iterator = miditracks_t::const_iterator;
+	uint32_t Size(void) const { return _Tracks.size(); }
 
-    iterator begin(void) { return _Tracks.begin(); }
-    iterator end(void) { return _Tracks.end(); }
+    std::vector<MIDITrack>::iterator begin(void) { return _Tracks.begin(); }
+    std::vector<MIDITrack>::iterator end(void) { return _Tracks.end(); }
 
-    const_iterator begin(void) const { return _Tracks.begin(); }
-    const_iterator end(void) const { return _Tracks.end(); }
-    const_iterator cbegin(void) const { return _Tracks.cbegin(); }
-    const_iterator cend(void) const { return _Tracks.cend(); }
+    std::vector<MIDITrack>::const_iterator begin(void) const { return _Tracks.begin(); }
+    std::vector<MIDITrack>::const_iterator end(void) const { return _Tracks.end(); }
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
+    std::vector<MIDITrack>::const_iterator cbegin(void) const { return _Tracks.cbegin(); }
+    std::vector<MIDITrack>::const_iterator cend(void) const { return _Tracks.cend(); }
+#endif
 
 public:
     enum
@@ -420,8 +435,8 @@ private:
     std::vector<MIDITrack> _Tracks;
 
     std::vector<uint8_t> _PortNumbers;
-
-    std::vector<std::vector<std::string>> _DeviceNames;
+	typedef std::vector<std::string> stringvector;
+    std::vector<stringvector> _DeviceNames;
 
     MIDIMetaData _ExtraMetaData;
 

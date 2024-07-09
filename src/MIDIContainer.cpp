@@ -41,7 +41,7 @@ void MIDITrack::AddEvent(const MIDIEvent & newEvent)
     {
         MIDIEvent & Event = *(it - 1);
 
-        if ((Event.Type == MIDIEvent::Extended) && (Event.Data.size() >= 2) && (Event.Data[0] == StatusCodes::MetaData) && (Event.Data[1] == MetaDataTypes::EndOfTrack))
+        if ((Event.Type == Extended) && (Event.Data.size() >= 2) && (Event.Data[0] == MetaData) && (Event.Data[1] == EndOfTrack))
         {
             --it;
 
@@ -100,7 +100,7 @@ uint32_t TempoMap::TimestampToMS(uint32_t p_timestamp, uint32_t division) const
 {
     uint32_t TimestampInMS = 0;
 
-    std::vector<const TempoItem>::iterator Iterator = _Items.begin();
+    std::vector<TempoItem>::const_iterator Iterator = _Items.begin();
 
     uint32_t Tempo = 500000;
 
@@ -210,7 +210,7 @@ bool MIDIMetaData::GetBitmap(std::vector<uint8_t> & bitmap) const
     return bitmap.size() != 0;
 }
 
-void MIDIMetaData::AssignBitmap(std::vector<uint8_t>::const_iterator const & begin, std::vector<uint8_t>::const_iterator const & end)
+void MIDIMetaData::AssignBitmap(std::vector<uint8_t>::const_iterator const begin, std::vector<uint8_t>::const_iterator const end)
 {
     _Bitmap.assign(begin, end);
 }
@@ -258,9 +258,9 @@ void MIDIContainer::AddTrack(const MIDITrack & track)
     {
         const MIDIEvent & Event = track[EventIndex];
 
-        if (Event.Type == MIDIEvent::Extended)
+        if (Event.Type == Extended)
         {
-            if ((Event.Data.size() >= 5) && (Event.Data[0] == StatusCodes::MetaData) && (Event.Data[1] == MetaDataTypes::SetTempo))
+            if ((Event.Data.size() >= 5) && (Event.Data[0] == MetaData) && (Event.Data[1] == SetTempo))
             {
                 uint32_t Tempo = (uint32_t)((Event.Data[2] << 16) | (Event.Data[3] << 8) | Event.Data[4]);
 
@@ -274,16 +274,14 @@ void MIDIContainer::AddTrack(const MIDITrack & track)
                     _TempoMaps[_Tracks.size() - 1].Add(Tempo, Event.Timestamp);
                 }
             }
-            else
-            if ((Event.Data.size() >= 3) && (Event.Data[0] == StatusCodes::MetaData))
+            else if ((Event.Data.size() >= 3) && (Event.Data[0] == MetaData))
             {
-                if (Event.Data[1] == MetaDataTypes::InstrumentName || Event.Data[1] == MetaDataTypes::DeviceName)
+                if ((Event.Data[1] == (uint8_t)InstrumentName) || (Event.Data[1] == (uint8_t)DeviceNameE))
                 {
                     DeviceName.assign(Event.Data.begin() + 2, Event.Data.end());
                     std::transform(DeviceName.begin(), DeviceName.end(), DeviceName.begin(), ::tolower);
                 }
-                else
-                if (Event.Data[1] == MetaDataTypes::MIDIPort)
+                else if (Event.Data[1] == (uint8_t)MIDIPort)
                 {
                     PortNumber = Event.Data[2];
 
@@ -293,7 +291,7 @@ void MIDIContainer::AddTrack(const MIDITrack & track)
             }
         }
         else
-        if (Event.Type == MIDIEvent::NoteOn || Event.Type == MIDIEvent::NoteOff)
+        if (Event.Type == NoteOnE || Event.Type == NoteOffE)
         {
             uint32_t ChannelNumber = Event.ChannelNumber;
 
@@ -352,7 +350,7 @@ void MIDIContainer::AddEventToTrack(size_t trackNumber, const MIDIEvent & event)
 
     Track.AddEvent(event);
 
-    if ((event.Type == MIDIEvent::Extended) && (event.Data.size() >= 5) && (event.Data[0] == StatusCodes::MetaData) && (event.Data[1] == MetaDataTypes::SetTempo))
+    if ((event.Type == Extended) && (event.Data.size() >= 5) && (event.Data[0] == MetaData) && (event.Data[1] == SetTempo))
     {
         uint32_t Tempo = (uint32_t)((event.Data[2] << 16) | (event.Data[3] << 8) | event.Data[4]);
 
@@ -367,7 +365,7 @@ void MIDIContainer::AddEventToTrack(size_t trackNumber, const MIDIEvent & event)
         }
     }
     else
-    if (event.Type == MIDIEvent::NoteOn || event.Type == MIDIEvent::NoteOff)
+    if (event.Type == NoteOnE || event.Type == NoteOffE)
     {
         if (_Format != 2)
         {
@@ -418,7 +416,7 @@ void MIDIContainer::ApplyHack(uint32_t hack)
 
                 for (size_t j = 0; j < t.GetLength(); )
                 {
-                    if ((t[j].Type != MIDIEvent::Extended) && (t[j].ChannelNumber == 16))
+                    if ((t[j].Type != Extended) && (t[j].ChannelNumber == 16))
                     {
                         t.RemoveEvent(j);
                     }
@@ -437,7 +435,7 @@ void MIDIContainer::ApplyHack(uint32_t hack)
 
                 for (size_t j = 0; j < t.GetLength(); )
                 {
-                    if (t[j].Type != MIDIEvent::Extended && (t[j].ChannelNumber - 10 < 6))
+                    if (t[j].Type != Extended && (t[j].ChannelNumber - 10 < 6))
                     {
                         t.RemoveEvent(j);
                     }
@@ -481,7 +479,7 @@ void MIDIContainer::SerializeAsStream(size_t subSongIndex, std::vector<MIDIStrea
             {
                 const MIDIEvent & Event = Track[j];
 
-                if ((Event.Type == MIDIEvent::ControlChange) && (Event.Data[0] == 110))
+                if ((Event.Type == ControlChangeE) && (Event.Data[0] == 110))
                 {
                     if ((Event.Data[1] != 0) && (Event.Data[1] != 1) && (Event.Data[1] != 0x7F))
                     {
@@ -535,10 +533,10 @@ void MIDIContainer::SerializeAsStream(size_t subSongIndex, std::vector<MIDIStrea
 
         if (CleanInstruments || CleanBanks)
         {
-            if (CleanInstruments && (Event.Type == MIDIEvent::ProgramChange))
+            if (CleanInstruments && (Event.Type == ProgramChangeE))
                 IsEventFiltered = true;
             else
-            if (CleanBanks && (Event.Type == MIDIEvent::ControlChange) && (Event.Data[0] == 0x00u || Event.Data[0] == 0x20u))
+            if (CleanBanks && (Event.Type == ControlChangeE) && (Event.Data[0] == 0x00u || Event.Data[0] == 0x20u))
                 IsEventFiltered = true;
         }
 
@@ -554,7 +552,7 @@ void MIDIContainer::SerializeAsStream(size_t subSongIndex, std::vector<MIDIStrea
 
             uint32_t TimestampInMS = TimestampToMS(Event.Timestamp, TempoTrackIndex);
 
-            if (Event.Type != MIDIEvent::Extended)
+            if (Event.Type != Extended)
             {
                 if (DeviceNames[SelectedTrack].length() != 0)
                 {
@@ -588,7 +586,7 @@ void MIDIContainer::SerializeAsStream(size_t subSongIndex, std::vector<MIDIStrea
             {
                 size_t DataSize = Event.Data.size();
 
-                if ((DataSize >= 3) && (Event.Data[0] == StatusCodes::SysEx))
+                if ((DataSize >= 3) && (Event.Data[0] == SysEx))
                 {
                     if (DeviceNames[SelectedTrack].length())
                     {
@@ -608,7 +606,7 @@ void MIDIContainer::SerializeAsStream(size_t subSongIndex, std::vector<MIDIStrea
 
                     Data = Event.Data;
 
-                    if (Data[DataSize - 1] == StatusCodes::SysExEnd)
+                    if (Data[DataSize - 1] == SysExEnd)
                     {
                         uint32_t Index = (uint32_t) sysExTable.AddItem(&Data[0], DataSize, PortNumbers[SelectedTrack]) | 0x80000000u;
 
@@ -616,16 +614,16 @@ void MIDIContainer::SerializeAsStream(size_t subSongIndex, std::vector<MIDIStrea
                     }
                 }
                 else
-                if ((DataSize >= 3) && (Event.Data[0] == StatusCodes::MetaData))
+                if ((DataSize >= 3) && (Event.Data[0] == MetaData))
                 {
-                    if (Event.Data[1] == MetaDataTypes::InstrumentName || Event.Data[1] == MetaDataTypes::DeviceName)
+                    if ((Event.Data[1] == (uint8_t)InstrumentName) || (Event.Data[1] == (uint8_t)DeviceNameE))
                     {
                         DeviceNames[SelectedTrack].assign(Event.Data.begin() + 2, Event.Data.end());
 
                         std::transform(DeviceNames[SelectedTrack].begin(), DeviceNames[SelectedTrack].end(), DeviceNames[SelectedTrack].begin(), ::tolower);
                     }
                     else
-                    if (Event.Data[1] == MetaDataTypes::MIDIPort)
+                    if (Event.Data[1] == MIDIPort)
                     {
                         PortNumbers[SelectedTrack] = Event.Data[2];
                         DeviceNames[SelectedTrack].clear();
@@ -634,7 +632,7 @@ void MIDIContainer::SerializeAsStream(size_t subSongIndex, std::vector<MIDIStrea
                     }
                 }
                 else
-                if ((DataSize == 1) && (Event.Data[0] > StatusCodes::SysExEnd))
+                if ((DataSize == 1) && (Event.Data[0] > SysExEnd))
                 {
                     if (DeviceNames[SelectedTrack].length())
                     {
@@ -689,8 +687,9 @@ void MIDIContainer::SerializeAsSMF(std::vector<uint8_t> & midiStream) const
 
     std::vector<uint8_t> Data;
 
-    for (const MIDITrack & Track : _Tracks)
+    for (int i = 0; i < this->Size() !=  0; i++)
     {
+        const MIDITrack & Track = _Tracks[i];
         const char ChunkType[] = "MTrk";
 
         midiStream.insert(midiStream.end(), ChunkType, ChunkType + 4);
@@ -703,15 +702,16 @@ void MIDIContainer::SerializeAsSMF(std::vector<uint8_t> & midiStream) const
         midiStream.push_back(0);
 
         uint32_t LastTimestamp = 0;
-        uint8_t LastStatus = StatusCodes::MetaData;
+        uint8_t LastStatus = MetaData;
 
-        for (const MIDIEvent & Event : Track)
+        for (int i = 0; i < Track.GetLength(); i++)
         {
+            const MIDIEvent & Event = Track[i];
             EncodeVariableLengthQuantity(midiStream, Event.Timestamp - LastTimestamp);
 
             LastTimestamp = Event.Timestamp;
 
-            if (Event.Type != MIDIEvent::Extended)
+            if (Event.Type != Extended)
             {
                 const uint8_t Status = (uint8_t) (((Event.Type + 8) << 4) + Event.ChannelNumber);
 
@@ -729,18 +729,18 @@ void MIDIContainer::SerializeAsSMF(std::vector<uint8_t> & midiStream) const
 
                 if (DataSize >= 1)
                 {
-                    if (Event.Data[0] == StatusCodes::SysEx)
+                    if (Event.Data[0] == SysEx)
                     {
                         --DataSize;
 
-                        midiStream.push_back(StatusCodes::SysEx);
+                        midiStream.push_back(SysEx);
                         EncodeVariableLengthQuantity(midiStream, DataSize);
 
                         if (DataSize != 0)
                             midiStream.insert(midiStream.end(), Event.Data.begin() + 1, Event.Data.end());
                     }
                     else
-                    if (Event.Data[0] == StatusCodes::MetaData && (DataSize >= 2))
+                    if (Event.Data[0] == MetaData && (DataSize >= 2))
                     {
                         DataSize -= 2;
 
@@ -792,12 +792,12 @@ void MIDIContainer::PromoteToType1(void)
     {
         const MIDIEvent & event = original_data_track[i];
 
-        if (event.Type != MIDIEvent::Extended)
+        if (event.Type != Extended)
         {
             new_tracks[1 + event.ChannelNumber].AddEvent(event);
         }
         else
-        if ((event.Data[0] != StatusCodes::MetaData) || (event.Data.size() < 2) || (event.Data[1] != MetaDataTypes::EndOfTrack))
+        if ((event.Data[0] != MetaData) || (event.Data.size() < 2) || (event.Data[1] != EndOfTrack))
         {
             new_tracks[0].AddEvent(event);
         }
@@ -935,7 +935,7 @@ uint32_t MIDIContainer::GetLoopEndTimestamp(size_t subSongIndex, bool ms /* = fa
 
 void MIDIContainer::GetMetaData(size_t subSongIndex, MIDIMetaData & metaData)
 {
-    const char * TypeName = nullptr;
+    const char * TypeName = NULL;
     uint32_t TypeTimestamp = 0;
 
     bool IsSoftKaraoke = false;
@@ -953,14 +953,14 @@ void MIDIContainer::GetMetaData(size_t subSongIndex, MIDIMetaData & metaData)
         {
             const MIDIEvent & Event = Track[j];
 
-            if (Event.Type != MIDIEvent::Extended)
+            if (Event.Type != Extended)
                 continue;
 
             size_t DataSize = Event.Data.size();
 
-            const char * TempTypeName = nullptr;
+            const char * TempTypeName = NULL;
 
-            if ((DataSize >= 1) && (Event.Data[0] == StatusCodes::SysEx))
+            if ((DataSize >= 1) && (Event.Data[0] == SysEx))
             {
                 switch (Event.Data[1])
                 {
@@ -1005,7 +1005,7 @@ void MIDIContainer::GetMetaData(size_t subSongIndex, MIDIMetaData & metaData)
                 }
             }
             else
-            if ((DataSize > 2) && (Event.Data[0] == StatusCodes::MetaData))
+            if ((DataSize > 2) && (Event.Data[0] == MetaData))
             {
                 char Name[32];
 
@@ -1017,11 +1017,11 @@ void MIDIContainer::GetMetaData(size_t subSongIndex, MIDIMetaData & metaData)
 
                 switch (Event.Data[1])
                 {
-                    case MetaDataTypes::Text:
+                    case TextE:
                     {
                         if (!IsSoftKaraoke)
                         {
-                            IsSoftKaraoke = (DataSize >= 19) && (::_strnicmp((const char *) Event.Data.data() + 2, "@KMIDI KARAOKE FILE", 19) == 0);
+                            IsSoftKaraoke = (DataSize >= 19) && (::_strnicmp((const char *) (const char *)(&Event.Data[2]/*.data() + 2*/), "@KMIDI KARAOKE FILE", 19) == 0);
 
                             if (IsSoftKaraoke)
                             {
@@ -1030,44 +1030,44 @@ void MIDIContainer::GetMetaData(size_t subSongIndex, MIDIMetaData & metaData)
                             else
                             {
                                 ::sprintf_s(Name, _countof(Name), "track_text_%02zd", i);
-                                AssignString((const char *) Event.Data.data() + 2, DataSize, Text);
+                                AssignString((const char *)((unsigned char *)(&Event.Data[2]/*.data() + 2*/)), DataSize, Text);
 
                                 metaData.AddItem(MIDIMetaDataItem(TimestampToMS(Event.Timestamp, TempoTrackIndex), Name, Text.c_str()));
                             }
                         }
                         else
                         {
-                            if ((DataSize > 2) && (::_strnicmp((const char *) Event.Data.data() + 2, "@K", 2) == 0))
+                            if ((DataSize > 2) && (::_strnicmp((const char *) ((unsigned char *)(&Event.Data[2]/*.data() + 2*/)), "@K", 2) == 0))
                             {
-                                AssignString((const char *) Event.Data.data() + 4, DataSize - 2, Text);
+                                AssignString((const char *)((unsigned char *)(&Event.Data[4]/*.data() + 4*/)), DataSize - 2, Text);
 
                                 metaData.AddItem(MIDIMetaDataItem(TimestampToMS(Event.Timestamp, TempoTrackIndex), "soft_karaoke_version", Text.c_str()));
                             }
                             else
-                            if ((DataSize > 2) && (::_strnicmp((const char *) Event.Data.data() + 2, "@L", 2) == 0))
+                            if ((DataSize > 2) && (::_strnicmp((const char *)((unsigned char *)(&Event.Data[2]/*.data() + 2*/)), "@L", 2) == 0))
                             {
-                                AssignString((const char *) Event.Data.data() + 4, DataSize - 2, Text);
+                                AssignString((const char *)(&Event.Data[4]/*.data()* + 4*/), DataSize - 2, Text);
 
                                 metaData.AddItem(MIDIMetaDataItem(TimestampToMS(Event.Timestamp, TempoTrackIndex), "soft_karaoke_language", Text.c_str()));
                             }
                             else
-                            if ((DataSize > 2) && (::_strnicmp((const char *) Event.Data.data() + 2, "@T", 2) == 0))
+                            if ((DataSize > 2) && (::_strnicmp((const char *)(&Event.Data[2]/*.data() + 2*/), "@T", 2) == 0))
                             {
-                                AssignString((const char *) Event.Data.data() + 4, DataSize - 2, Text);
+                                AssignString((const char *)(&Event.Data[4]/*.data() + 4*/), DataSize - 2, Text);
 
                                 metaData.AddItem(MIDIMetaDataItem(TimestampToMS(Event.Timestamp, TempoTrackIndex), "soft_karaoke_text", Text.c_str()));
                             }
                             else
-                            if ((DataSize > 2) && (::_strnicmp((const char *) Event.Data.data() + 2, "@I", 2) == 0))
+                            if ((DataSize > 2) && (::_strnicmp((const char *)(&Event.Data[2]/*.data() + 2*/), "@I", 2) == 0))
                             {
-                                AssignString((const char *) Event.Data.data() + 4, DataSize - 2, Text);
+                                AssignString((const char *)(&Event.Data[4]/*.data() + 4*/), DataSize - 2, Text);
 
                                 metaData.AddItem(MIDIMetaDataItem(TimestampToMS(Event.Timestamp, TempoTrackIndex), "soft_karaoke_info", Text.c_str()));
                             }
                             else
-                            if ((DataSize > 2) && (::_strnicmp((const char *) Event.Data.data() + 2, "@W", 2) == 0))
+                            if ((DataSize > 2) && (::_strnicmp((const char *)(&Event.Data[2]/*.data() + 2*/), "@W", 2) == 0))
                             {
-                                AssignString((const char *) Event.Data.data() + 4, DataSize - 2, Text);
+                                AssignString((const char *)(&Event.Data[4]/*.data() + 4*/), DataSize - 2, Text);
 
                                 metaData.AddItem(MIDIMetaDataItem(TimestampToMS(Event.Timestamp, TempoTrackIndex), "soft_karaoke_words", Text.c_str()));
                             }
@@ -1076,13 +1076,13 @@ void MIDIContainer::GetMetaData(size_t subSongIndex, MIDIMetaData & metaData)
                             {
                                 // Unknown Soft Karaoke tag
                                 ::sprintf_s(Name, _countof(Name), "track_text_%02zd", i);
-                                AssignString((const char *) Event.Data.data() + 2, DataSize, Text);
+                                AssignString((const char *)(&Event.Data[2]/*.data() + 2*/), DataSize, Text);
 
                                 metaData.AddItem(MIDIMetaDataItem(TimestampToMS(Event.Timestamp, TempoTrackIndex), Name, Text.c_str()));
                             }
                             else
                             {
-                                AssignString((const char *) Event.Data.data() + 2, DataSize, Text);
+                                AssignString((const char *)(&Event.Data[2]/*.data() + 2*/), DataSize, Text);
 
                                 metaData.AddItem(MIDIMetaDataItem(TimestampToMS(Event.Timestamp, TempoTrackIndex), "soft_karaoke_lyrics", Text.c_str()));
                             }
@@ -1090,55 +1090,55 @@ void MIDIContainer::GetMetaData(size_t subSongIndex, MIDIMetaData & metaData)
                         break;
                     }
 
-                    case MetaDataTypes::Copyright:
+                    case Copyright:
                     {
-                        AssignString((const char *) Event.Data.data() + 2, DataSize, Text);
+                        AssignString((const char *)(&Event.Data[2]/*.data() + 2*/), DataSize, Text);
 
                         metaData.AddItem(MIDIMetaDataItem(TimestampToMS(Event.Timestamp, TempoTrackIndex), "copyright", Text.c_str()));
                         break;
                     }
 
-                    case MetaDataTypes::TrackName:
-                    case MetaDataTypes::InstrumentName:
+                    case TrackName:
+                    case InstrumentName:
                     {
                         ::sprintf_s(Name, _countof(Name), "track_name_%02u", (unsigned int)i);
-                        AssignString((const char *) Event.Data.data() + 2, DataSize, Text);
+                        AssignString((const char *)(&Event.Data[2]/*.data() + 2*/), DataSize, Text);
 
                         metaData.AddItem(MIDIMetaDataItem(TimestampToMS(Event.Timestamp, TempoTrackIndex), Name, Text.c_str()));
                         break;
                     }
 
                     // Tune 1000 Karaoke format (https://www.mixagesoftware.com/en/midikit/help/HTML/karaoke_formats.html)
-                    case MetaDataTypes::Lyrics:
+                    case Lyrics:
                     {
-                        AssignString((const char *) Event.Data.data() + 2, DataSize, Text);
+                        AssignString((const char *)(&Event.Data[2]/*.data() + 2*/), DataSize, Text);
 
                         metaData.AddItem(MIDIMetaDataItem(TimestampToMS(Event.Timestamp, TempoTrackIndex), "lyrics", Text.c_str()));
                         break;
                     }
 
-                    case MetaDataTypes::Marker:
+                    case Marker:
                     {
-                        AssignString((const char *) Event.Data.data() + 2, DataSize, Text);
+                        AssignString((const char *)(&Event.Data[2]/*.data() + 2*/), DataSize, Text);
 
                         metaData.AddItem(MIDIMetaDataItem(TimestampToMS(Event.Timestamp, TempoTrackIndex), "track_marker", Text.c_str()));
                         break;
                     }
 
-                    case MetaDataTypes::CueMarker:
+                    case CueMarker:
                     {
-                        AssignString((const char *) Event.Data.data() + 2, DataSize, Text);
+                        AssignString((const char *)(&Event.Data[2]/*.data() + 2*/), DataSize, Text);
 
                         metaData.AddItem(MIDIMetaDataItem(TimestampToMS(Event.Timestamp, TempoTrackIndex), "cue_marker", Text.c_str()));
                         break;
                     }
 
-                    case MetaDataTypes::SetTempo:
+                    case SetTempo:
                     {
                         break;
                     }
 
-                    case MetaDataTypes::TimeSignature:
+                    case TimeSignature:
                     {
                         if (DataSize == 4)
                         {
@@ -1148,7 +1148,7 @@ void MIDIContainer::GetMetaData(size_t subSongIndex, MIDIMetaData & metaData)
                         break;
                     }
 
-                    case MetaDataTypes::KeySignature:
+                    case KeySignature:
                     {
                         if (DataSize == 2)
                         {
@@ -1177,9 +1177,9 @@ void MIDIContainer::GetMetaData(size_t subSongIndex, MIDIMetaData & metaData)
             }
 
             // Remember the container type name: MT-32 or GM < GM2 < GS < XG
-            if (TempTypeName != nullptr)
+            if (TempTypeName != NULL)
             {
-                if ((TypeName != nullptr) && (::_stricmp(TypeName, "MT-32") != 0))
+                if ((TypeName != NULL) && (::_stricmp(TypeName, "MT-32") != 0))
                 {
                     if ((::_stricmp(TypeName, "GM") == 0) && (::_stricmp(TempTypeName, "GM2") == 0))
                         TypeName = TempTypeName;
@@ -1229,7 +1229,7 @@ void MIDIContainer::TrimRange(size_t start, size_t end)
         {
             const MIDIEvent & Event = Track[j];
 
-            if (Event.Type == MIDIEvent::NoteOn && Event.Data[0])
+            if (Event.Type == NoteOnE && Event.Data[0])
                 break;
         }
 
@@ -1331,7 +1331,7 @@ void MIDIContainer::SplitByInstrumentChanges(SplitCallback callback)
         {
             const MIDIEvent & Event = SrcTrack[k];
 
-            if ((Event.Type == MIDIEvent::ProgramChange) || ((Event.Type == MIDIEvent::ControlChange) && (Event.Data[0] == ControlChangeNumbers::BankSelect || Event.Data[0] == ControlChangeNumbers::LSB)))
+            if ((Event.Type == ProgramChangeE) || ((Event.Type == ControlChangeE) && (Event.Data[0] == BankSelect || Event.Data[0] == LSB)))
             {
                 ProgramChangeTrack.AddEvent(Event);
             }
@@ -1353,7 +1353,7 @@ void MIDIContainer::SplitByInstrumentChanges(SplitCallback callback)
                         {
                             const MIDIEvent & ev = ProgramChangeTrack[m];
 
-                            if (ev.Type == MIDIEvent::ProgramChange)
+                            if (ev.Type == ProgramChangeE)
                                 instrument = ev.Data[0];
                             else
                                 if (ev.Data[0] == 0)
@@ -1375,7 +1375,7 @@ void MIDIContainer::SplitByInstrumentChanges(SplitCallback callback)
 
                             std::copy(Name.begin(), Name.end(), Data.begin() + 2);
 
-                            DstTrack.AddEvent(MIDIEvent(timestamp, MIDIEvent::Extended, 0, Data.data(), Data.size()));
+                            DstTrack.AddEvent(MIDIEvent(timestamp, Extended, 0, (unsigned char *)(&Data[0]/*.data()*/), Data.size()));
                         }
                     }
 
@@ -1417,7 +1417,7 @@ void MIDIContainer::DetectLoops(bool detectXMILoops, bool detectMarkerLoops, boo
             {
                 const MIDIEvent & Event = Track[j];
 
-                if (Event.Type == MIDIEvent::ControlChange)
+                if (Event.Type == ControlChangeE)
                 {
                     if (Event.Data[0] == 2)
                     {
@@ -1463,7 +1463,7 @@ void MIDIContainer::DetectLoops(bool detectXMILoops, bool detectMarkerLoops, boo
             {
                 const MIDIEvent & Event = Track[j];
 
-                if ((Event.Type == MIDIEvent::ControlChange) && (Event.Data[0] == 110 /* 0x6E */ || Event.Data[0] == 111 /* 0x6F */))
+                if ((Event.Type == ControlChangeE) && (Event.Data[0] == 110 /* 0x6E */ || Event.Data[0] == 111 /* 0x6F */))
                 {
                     if (Event.Data[0] == 110 /* 0x6E */)
                     {
@@ -1498,7 +1498,7 @@ void MIDIContainer::DetectLoops(bool detectXMILoops, bool detectMarkerLoops, boo
             {
                 const MIDIEvent & Event = Track[j];
 
-                if ((Event.Type == MIDIEvent::ControlChange) && (Event.Data[0] >= 116 /* 0x74 */ && Event.Data[0] <= 119 /* 0x77 */))
+                if ((Event.Type == ControlChangeE) && (Event.Data[0] >= 116 /* 0x74 */ && Event.Data[0] <= 119 /* 0x77 */))
                 {
                 #ifdef _DEBUG
                     wchar_t Line[256]; ::swprintf_s(Line, _countof(Line), L"EMIDI: %08X %3d %3d\n", Event.Timestamp, Event.Data[0], Event.Data[1]); ::OutputDebugStringW(Line);
@@ -1533,7 +1533,7 @@ void MIDIContainer::DetectLoops(bool detectXMILoops, bool detectMarkerLoops, boo
             {
                 const MIDIEvent & Event = Track[j];
 
-                if ((Event.Type == MIDIEvent::Extended) && (Event.Data.size() >= 9) && (Event.Data[0] == 0xFF) && (Event.Data[1] == 0x06))
+                if ((Event.Type == Extended) && (Event.Data.size() >= 9) && (Event.Data[0] == 0xFF) && (Event.Data[1] == 0x06))
                 {
                     size_t Size = Event.Data.size() - 2;
 
@@ -1541,13 +1541,13 @@ void MIDIContainer::DetectLoops(bool detectXMILoops, bool detectMarkerLoops, boo
 
 //                  Event.GetData(Name.data(), 2, Size);
 
-                    if ((Size == 9) && (::_strnicmp((const char *) Name.data(), "loopStart", 9) == 0))
+                    if ((Size == 9) && (::_strnicmp((const char *)(&Name[0]/*.data()*/), "loopStart", 9) == 0))
                     {
                         if (!_Loop[SubSongIndex].HasBegin() || (Event.Timestamp < _Loop[SubSongIndex].Begin()))
                             _Loop[SubSongIndex].SetBegin(Event.Timestamp);
                     }
                     else
-                    if ((Size == 7) && (::_strnicmp((const char *) Name.data(), "loopEnd", 7) == 0))
+                    if ((Size == 7) && (::_strnicmp((const char *)(&Name[0]/*.data()*/), "loopEnd", 7) == 0))
                     {
                         if (!_Loop[SubSongIndex].HasEnd() || (Event.Timestamp > _Loop[SubSongIndex].End()))
                             _Loop[SubSongIndex].SetEnd(Event.Timestamp);

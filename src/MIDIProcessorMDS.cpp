@@ -88,7 +88,7 @@ bool MIDIProcessor::ProcessMDS(std::vector<uint8_t> const & data, MIDIContainer 
     {
         MIDITrack Track;
 
-        Track.AddEvent(MIDIEvent(0, MIDIEvent::Extended, 0, MIDIEventEndOfTrack, _countof(MIDIEventEndOfTrack)));
+        Track.AddEvent(MIDIEvent(0, Extended, 0, MIDIEventEndOfTrack, _countof(MIDIEventEndOfTrack)));
         container.AddTrack(Track);
     }
 
@@ -145,13 +145,13 @@ bool MIDIProcessor::ProcessMDS(std::vector<uint8_t> const & data, MIDIContainer 
 
             if ((Event >> 24) == 0x01)
             {
-                uint8_t Data[5] = { StatusCodes::MetaData, MetaDataTypes::SetTempo };
+                uint8_t Data[5] = { MetaData, SetTempo };
 
                 Data[2] = (uint8_t) (Event >> 16);
                 Data[3] = (uint8_t) (Event >> 8);
                 Data[4] = (uint8_t)  Event;
 
-                container.AddEventToTrack(0, MIDIEvent(Timestamp, MIDIEvent::Extended, 0, Data, sizeof(Data)));
+                container.AddEventToTrack(0, MIDIEvent(Timestamp, Extended, 0, Data, sizeof(Data)));
             }
             else
             if ((Event >> 24) == 0x00)
@@ -169,13 +169,13 @@ bool MIDIProcessor::ProcessMDS(std::vector<uint8_t> const & data, MIDIContainer 
                         Size = 2;
                     }
 
-                    Track.AddEvent(MIDIEvent(Timestamp, (MIDIEvent::EventType) (StatusCode - 8), Event & 0x0F, Data, Size));
+                    Track.AddEvent(MIDIEvent(Timestamp, (EventType) (StatusCode - 8), Event & 0x0F, Data, Size));
                 }
             }
         }
     }
 
-    Track.AddEvent(MIDIEvent(Timestamp, MIDIEvent::Extended, 0, MIDIEventEndOfTrack, _countof(MIDIEventEndOfTrack)));
+    Track.AddEvent(MIDIEvent(Timestamp, Extended, 0, MIDIEventEndOfTrack, _countof(MIDIEventEndOfTrack)));
 
     container.AddTrack(Track);
 

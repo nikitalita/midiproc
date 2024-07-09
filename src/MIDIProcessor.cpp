@@ -5,16 +5,16 @@
 
 MIDIError MIDIProcessor::_ErrorCode;
 
-const uint8_t MIDIProcessor::MIDIEventEndOfTrack[2] = { StatusCodes::MetaData, MetaDataTypes::EndOfTrack };
-const uint8_t MIDIProcessor::LoopBeginMarker[11]    = { StatusCodes::MetaData, MetaDataTypes::Marker, 'l', 'o', 'o', 'p', 'S', 't', 'a', 'r', 't' };
-const uint8_t MIDIProcessor::LoopEndMarker[9]       = { StatusCodes::MetaData, MetaDataTypes::Marker, 'l', 'o', 'o', 'p', 'E', 'n', 'd' };
+const uint8_t MIDIProcessor::MIDIEventEndOfTrack[2] = { MetaData, EndOfTrack };
+const uint8_t MIDIProcessor::LoopBeginMarker[11]    = { MetaData, Marker, 'l', 'o', 'o', 'p', 'S', 't', 'a', 'r', 't' };
+const uint8_t MIDIProcessor::LoopEndMarker[9]       = { MetaData, Marker, 'l', 'o', 'o', 'p', 'E', 'n', 'd' };
 
 /// <summary>
 /// Processes a stream of bytes.
 /// </summary>
 bool MIDIProcessor::Process(std::vector<uint8_t> const & data, const char * fileExtension, MIDIContainer & container)
 {
-    _ErrorCode = MIDIError::None;
+    _ErrorCode = MENone;
 
     if (IsSMF(data))
         return ProcessSMF(data, container);
@@ -62,7 +62,7 @@ bool MIDIProcessor::IsSysEx(std::vector<uint8_t> const & data)
     if (data.size() < 2)
         return false;
 
-    if (data[0] != StatusCodes::SysEx || data[data.size() - 1] != StatusCodes::SysExEnd)
+    if (data[0] != SysEx || data[data.size() - 1] != SysExEnd)
         return false;
 
     return true;
@@ -85,12 +85,12 @@ bool MIDIProcessor::ProcessSysEx(std::vector<uint8_t> const & data, MIDIContaine
     {
         size_t MessageLength = 1;
 
-        if (data[Index] != StatusCodes::SysEx)
+        if (data[Index] != SysEx)
             return false;
 
-        while (data[Index + MessageLength++] != StatusCodes::SysExEnd);
+        while (data[Index + MessageLength++] != SysExEnd);
 
-        Track.AddEvent(MIDIEvent(0, MIDIEvent::Extended, 0, &data[Index], MessageLength));
+        Track.AddEvent(MIDIEvent(0, Extended, 0, &data[Index], MessageLength));
 
         Index += MessageLength;
     }
