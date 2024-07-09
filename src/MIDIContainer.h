@@ -58,12 +58,12 @@ typedef enum MetaDataTypes
 {
     SequenceNumber = 0x00,      // Sequence number in type 0 and 1 MIDI files; pattern number in type 2 MIDI files. (0..65535, default 0, occurs at delta time 0)
     TextE = 0x01,                // General "Text" Meta Message. Can be used for any text based data. (string)
-    Copyright = 0x02,           // Provides information about a MIDI file’s copyright. (string, occurs at delta time 0 in the first track)
+    Copyright = 0x02,           // Provides information about a MIDI fileâ€™s copyright. (string, occurs at delta time 0 in the first track)
     TrackName = 0x03,           // Track name (string, occurs at delta time 0)
     InstrumentName = 0x04,      // Instrument name (string)
     Lyrics = 0x05,              // Stores the lyrics of a song. Typically one syllable per Meta Message. (string)
     Marker = 0x06,              // Marks a point of interest in a MIDI file. Can be used as the marker for the beginning of a verse, solo, etc. (string)
-    CueMarker = 0x07,           // Marks a cue. IE: ‘Cue performer 1’, etc (string)
+    CueMarker = 0x07,           // Marks a cue. IE: â€˜Cue performer 1â€™, etc (string)
 
     DeviceNameE = 0x09,          // Gives the name of the device. (string)
 
@@ -147,7 +147,7 @@ public:
 
     std::vector<MIDIEvent>::const_iterator begin(void) const { return _Events.begin(); }
     std::vector<MIDIEvent>::const_iterator end(void) const { return _Events.end(); }
-#if MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
+#if (MAC_OS_X_VERSION_MIN_REQUIRED >= 1070) || defined(WIN32) || defined(_WIN32) || defined(ANDROID) || defined(__ANDROID__) || defined(__linux__)
     std::vector<MIDIEvent>::const_iterator cbegin(void) const { return _Events.cbegin(); }
     std::vector<MIDIEvent>::const_iterator cend(void) const { return _Events.cend(); }
 #endif
@@ -368,7 +368,7 @@ public:
 
     std::vector<MIDITrack>::const_iterator begin(void) const { return _Tracks.begin(); }
     std::vector<MIDITrack>::const_iterator end(void) const { return _Tracks.end(); }
-#if MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
+#if (MAC_OS_X_VERSION_MIN_REQUIRED >= 1070) || defined(WIN32) || defined(_WIN32) || defined(ANDROID) || defined(__ANDROID__) || defined(__linux__)
     std::vector<MIDITrack>::const_iterator cbegin(void) const { return _Tracks.cbegin(); }
     std::vector<MIDITrack>::const_iterator cend(void) const { return _Tracks.cend(); }
 #endif
