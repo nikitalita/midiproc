@@ -32,10 +32,9 @@ if (BUILD_SDL_TEST)
 
     target_link_libraries(sdl_test
          PUBLIC
-         $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
-         $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+         SDL2 SDL2main
      )
-    target_link_libraries(sdl_test PUBLIC $<IF:$<TARGET_EXISTS:SDL2_mixer_ext::SDL2_mixer_ext>,SDL2_mixer_ext::SDL2_mixer_ext,SDL2_mixer_ext::SDL2_mixer_ext_Static>)
+    target_link_libraries(sdl_test PUBLIC SDL2_mixer_ext)
     target_link_libraries(sdl_test PUBLIC ${MIDIPROC_TARGET_NAME})
 endif()
 
