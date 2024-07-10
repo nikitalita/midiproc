@@ -5,6 +5,7 @@
 
 // include time.h for time_t
 #ifdef _WIN32
+#include <windows.h>
 #include <time.h>
 #else
 #include <sys/time.h>
@@ -39,6 +40,9 @@ int samples_remaining = 0;
 void reload_sample_queue(){
     // take the chu
 }
+
+#undef  SDL_main
+#define SDL_main main
 
 int main(int argc, char ** argv){
     // first argument is the file to test
@@ -143,8 +147,8 @@ int main(int argc, char ** argv){
         return 1;
     }
     samples_remaining = chunk->alen / 2;
-    
-    Mix_Music * music = Mix_LoadMUSType_RW_ARG(SDL_RWFromConstMem(data_out, data_out_size), MUS_MID, 1, "s4;p512;");
+
+    Mix_Music * music = Mix_LoadMUSType_RW_ARG(SDL_RWFromConstMem(data_out, data_out_size), MUS_MID, 1, "s1;p512;");
     if (music == NULL)
     {
         printf("Failed to load music\n");
