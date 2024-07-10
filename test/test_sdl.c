@@ -122,7 +122,7 @@ int main(int argc, char ** argv){
         printf("Failed to initialize mixer\n");
         return 1;
     }
-    if (Mix_SetSoundFonts("/Users/nikita/Library/Audio/Sounds/Banks/Live_HQ_Natural_edit.sf2") == 0)
+    if (Mix_SetSoundFonts("/Users/andyvand/Downloads/FluidR3 GM.SF2") == 0)
     {
         printf("Failed to set soundfont\n");
         return 1;
@@ -136,7 +136,7 @@ int main(int argc, char ** argv){
     // copy the header from the output data
     uint8_t header[14];
     memcpy(header, data_out, 14);
-    chunk = Mix_LoadWAV("/Users/nikita/Workspace/libmidiproc/test-files/gun-gunshot-01.wav");
+    chunk = Mix_LoadWAV("/Users/andyvand/Downloads/gun-gunshot-02.wav");
     if (chunk == NULL)
     {
         printf("Failed to load chunk\n");

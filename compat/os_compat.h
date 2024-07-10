@@ -7,10 +7,16 @@
 #ifdef _WIN32
 #include <windows.h>
 #else
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <unistd.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <wchar.h>
+#ifdef __cplusplus
+}
+#endif
 
 #ifndef MAX_PATH
 #define MAX_PATH PATH_MAX
