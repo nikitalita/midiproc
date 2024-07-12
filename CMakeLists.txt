@@ -5,11 +5,17 @@ project(midiproc VERSION 0.1.0 LANGUAGES CXX C)
 set(CMAKE_CXX_STANDARD 11)
 
 set(MIDIPROC_TARGET_NAME ${PROJECT_NAME})
+set(MIDIPROC_TARGET_NAME_SHARED ${PROJECT_NAME}_shared)
 
 file(GLOB SOURCES "src/*.cpp" "compat/os_compat.c")
 
 add_library(${MIDIPROC_TARGET_NAME} ${SOURCES})
 target_include_directories(${MIDIPROC_TARGET_NAME} PRIVATE compat)
+
+option(BUILD_SHARED "Build shared library" OFF)
+if (BUILD_SHARED)
+    add_library(${MIDIPROC_TARGET_NAME_SHARED} SHARED ${SOURCES})
+endif()
 
 add_executable(test test/test_midiproc.c)
 target_include_directories(test PRIVATE src)
