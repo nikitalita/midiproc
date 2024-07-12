@@ -10,7 +10,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#ifdef __GNUC__
 #include <unistd.h>
+#endif
+
 #include <stdarg.h>
 #include <stdint.h>
 #include <wchar.h>
