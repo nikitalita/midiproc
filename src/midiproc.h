@@ -1,3 +1,6 @@
+#ifndef __MIDIPROC_H__
+#define __MIDIPROC_H__
+
 #pragma once
 // C API
 #include <stdint.h>
@@ -87,3 +90,5 @@ EXPORT void MIDPROC_Container_DetectLoops(HMIDIContainer container, bool detectX
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* __MIDIPROC_H__ */
