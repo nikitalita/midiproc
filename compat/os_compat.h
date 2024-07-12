@@ -4,7 +4,7 @@
 // if windows
 #pragma once
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32)
 #include <windows.h>
 #else
 #ifdef __cplusplus
