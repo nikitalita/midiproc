@@ -15,6 +15,7 @@ target_include_directories(${MIDIPROC_TARGET_NAME} PRIVATE compat)
 option(BUILD_SHARED "Build shared library" OFF)
 if (BUILD_SHARED)
     add_library(${MIDIPROC_TARGET_NAME_SHARED} SHARED ${SOURCES})
+    target_include_directories(${MIDIPROC_TARGET_NAME_SHARED} PRIVATE compat)
 endif()
 
 add_executable(test test/test_midiproc.c)
