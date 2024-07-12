@@ -76,7 +76,7 @@ int main(int argc, char ** argv){
     fclose(file);
     size_t start = get_time_in_us();
     uint8_t * data_out;
-    size_t data_out_size = process_and_serialize_to_smf(data, file_size, extension, &data_out);
+    size_t data_out_size = MIDPROC_process_and_serialize_to_smf(data, file_size, extension, &data_out);
     if (data_out_size == 0)
     {
         printf("Failed to process data\n");

@@ -1,3 +1,6 @@
+#ifndef __STRING_COMPAT_H__
+#define __STRING_COMPAT_H__
+
 #pragma once
 
 #include <string.h>
@@ -13,3 +16,5 @@
 #define _strnicmp strncasecmp
 #endif
 #endif
+
+#endif /* __STRING_COMPAT_H__ */

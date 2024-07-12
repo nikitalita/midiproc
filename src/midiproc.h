@@ -1,3 +1,6 @@
+#ifndef __MIDIPROC_H__
+#define __MIDIPROC_H__
+
 #pragma once
 // C API
 #include <stdint.h>
@@ -5,6 +8,8 @@
 #include <stdbool.h>
 #ifdef _WIN32
 #define EXPORT __declspec(dllexport)
+#elif defined(__GNUC__) && (__GNUC__ >= 4)
+#define EXPORT __attribute__((visibility("default")))
 #else
 #define EXPORT
 #endif
@@ -85,3 +90,5 @@ EXPORT void MIDPROC_Container_DetectLoops(HMIDIContainer container, bool detectX
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* __MIDIPROC_H__ */
