@@ -1,25 +1,18 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.18)
 
 project(midiproc VERSION 0.1.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 11)
 
 set(MIDIPROC_TARGET_NAME ${PROJECT_NAME})
-set(MIDIPROC_TARGET_NAME_SHARED ${PROJECT_NAME}_shared)
 
 file(GLOB SOURCES "src/*.cpp" "compat/os_compat.c")
 
 add_library(${MIDIPROC_TARGET_NAME} ${SOURCES})
-
-option(BUILD_SHARED "Build shared library" OFF)
-if (BUILD_SHARED)
-    add_library(${MIDIPROC_TARGET_NAME_SHARED} SHARED ${SOURCES})
-endif()
-
 target_include_directories(${MIDIPROC_TARGET_NAME} PRIVATE compat)
 
-add_executable(test_midiproc test/test_midiproc.c)
-target_include_directories(test_midiproc PRIVATE src)
+add_executable(test test/test_midiproc.c)
+target_include_directories(test PRIVATE src)
 
 
 option(BUILD_SDL_TEST "Build the SDL test" OFF)
@@ -32,14 +25,15 @@ if (BUILD_SDL_TEST)
 
     target_link_libraries(sdl_test
          PUBLIC
-         SDL2 SDL2main
+         $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+         $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
      )
-    target_link_libraries(sdl_test PUBLIC SDL2_mixer_ext)
+    target_link_libraries(sdl_test PUBLIC $<IF:$<TARGET_EXISTS:SDL2_mixer_ext::SDL2_mixer_ext>,SDL2_mixer_ext::SDL2_mixer_ext,SDL2_mixer_ext::SDL2_mixer_ext_Static>)
     target_link_libraries(sdl_test PUBLIC ${MIDIPROC_TARGET_NAME})
 endif()
 
 
-target_link_libraries(test_midiproc ${MIDIPROC_TARGET_NAME})
+target_link_libraries(test ${MIDIPROC_TARGET_NAME})
 
 
 #check if CMAKE_INSTALL_LIBDIR is defined
@@ -75,7 +69,7 @@ set(MIDIPROC_CMAKE_PROJECT_PKGCONFIG_FILE "${MIDIPROC_CMAKE_CONFIG_DIR}/${MIDIPR
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-	${MIDIPROC_CMAKE_VERSION_CONFIG_FILE} COMPATIBILITY SameMajorVersion
+	${MIDIPROC_CMAKE_VERSION_CONFIG_FILE} COMPATIBILITY SameMinorVersion
 )
 configure_package_config_file(
 	${MIDIPROC_CMAKE_CONFIG_TEMPLATE}

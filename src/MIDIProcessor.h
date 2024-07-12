@@ -1,5 +1,3 @@
-#ifndef __MIDIPROCESSOR_H__
-#define __MIDIPROCESSOR_H__
 
 /** $VER: MIDIProcessor.h (2024.05.05) **/
 
@@ -7,13 +5,9 @@
 
 #include "MIDIContainer.h"
 
-#ifndef noexcept
-#define noexcept
-#endif
-
-typedef enum MIDIError
+enum MIDIError
 {
-    MENone = 0,
+    None = 0,
 
     UnknownStatusCode,                  // Unknown MIDI status code
 
@@ -42,14 +36,14 @@ typedef enum MIDIError
     XMIFORMXMIDNotFound,                // FORM XMID chunk not found
     XMIEVNTChunkNotFound,               // EVNT chunk not found
     XMIInvalidNoteMessage,              // Invalid note message
-} MIDIError;
+};
 
 class MIDIProcessor
 {
 public:
     static bool Process(std::vector<uint8_t> const & data, const char * fileExtension, MIDIContainer & container);
 
-    static MIDIError GetLastErrorCode(void) noexcept { return _ErrorCode; }
+    static MIDIError GetLastErrorCode() noexcept { return _ErrorCode; }
 
 private:
     static int      DecodeVariableLengthQuantity   (std::vector<uint8_t>::const_iterator & it, std::vector<uint8_t>::const_iterator end) noexcept;
@@ -109,5 +103,3 @@ private:
 
     static const uint8_t DefaultTempoLDS[5];
 };
-
-#endif /* __MIDIPROCESSOR_H__ */

@@ -1,11 +1,4 @@
-#ifndef __STRING_COMPAT_H__
-#define __STRING_COMPAT_H__
-
 #pragma once
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <string.h>
 
@@ -20,9 +13,3 @@ extern "C" {
 #define _strnicmp strncasecmp
 #endif
 #endif
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* __STRING_COMPAT_H__ */

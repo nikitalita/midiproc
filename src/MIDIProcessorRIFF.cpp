@@ -1,10 +1,10 @@
 
 /** $VER: MIDIProcessorRIFF.cpp (2023.08.14) **/
+
 #include "MIDIProcessor.h"
 
-#include "../compat/string_compat.h"
-#include "../compat/common_compat.h"
-
+#include "string_compat.h"
+#include "common_compat.h"
 static inline uint32_t toInt32LE(const uint8_t * data)
 {
     return static_cast<uint32_t>(data[0]) | static_cast<uint32_t>(data[1] << 8) | static_cast<uint32_t>(data[2] << 16) | static_cast<uint32_t>(data[3] << 24);
@@ -49,9 +49,9 @@ bool MIDIProcessor::GetTrackCountFromRIFF(std::vector<uint8_t> const & data, siz
 
     uint32_t Size = (uint32_t)(data[4] | (data[5] << 8) | (data[6] << 16) | (data[7] << 24));
 
-    std::vector<uint8_t>::const_iterator it = data.begin() + 12;
+    auto it = data.begin() + 12;
 
-    std::vector<uint8_t>::const_iterator body_end = data.begin() + 8 + Size;
+    auto body_end = data.begin() + 8 + Size;
 
     std::vector<uint8_t> extra_buffer;
 
@@ -113,9 +113,9 @@ bool MIDIProcessor::ProcessRIFF(std::vector<uint8_t> const & data, MIDIContainer
 {
     uint32_t Size = (uint32_t) (data[4] | (data[5] << 8) | (data[6] << 16) | (data[7] << 24));
 
-    std::vector<uint8_t>::const_iterator it = data.begin() + 12;
+    auto it = data.begin() + 12;
 
-    std::vector<uint8_t>::const_iterator body_end = data.begin() + 8 + (int) Size;
+    auto body_end = data.begin() + 8 + (int) Size;
 
     bool found_data = false;
     bool found_info = false;
@@ -168,7 +168,7 @@ bool MIDIProcessor::ProcessRIFF(std::vector<uint8_t> const & data, MIDIContainer
         else
         if (::memcmp(&it[0], "LIST", 4) == 0)
         {
-            std::vector<uint8_t>::const_iterator chunk_end = it + 8 + (int) chunk_size;
+            auto chunk_end = it + 8 + (int) chunk_size;
 
             if (::memcmp(&it[8], "INFO", 4) == 0)
             {

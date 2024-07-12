@@ -25,15 +25,15 @@ bool MIDIProcessor::ProcessGMF(std::vector<uint8_t> const & data, MIDIContainer 
 
     MIDITrack Track;
 
-    Data[0] = MetaData;
-    Data[1] = SetTempo;
+    Data[0] = StatusCodes::MetaData;
+    Data[1] = MetaDataTypes::SetTempo;
     Data[2] = (uint8_t) (ScaledTempo >> 16);
     Data[3] = (uint8_t) (ScaledTempo >>  8);
     Data[4] = (uint8_t)  ScaledTempo;
 
-    Track.AddEvent(MIDIEvent(0, Extended, 0, Data, 5));
+    Track.AddEvent(MIDIEvent(0, MIDIEvent::Extended, 0, Data, 5));
 
-    Data[0] = SysEx;
+    Data[0] = StatusCodes::SysEx;
     Data[1] = 0x41;
     Data[2] = 0x10;
     Data[3] = 0x16;
@@ -42,18 +42,18 @@ bool MIDIProcessor::ProcessGMF(std::vector<uint8_t> const & data, MIDIContainer 
     Data[6] = 0x00;
     Data[7] = 0x00;
     Data[8] = 0x01;
-    Data[9] = SysExEnd;
+    Data[9] = StatusCodes::SysExEnd;
 
-    Track.AddEvent(MIDIEvent(0, Extended, 0, Data, 10));
+    Track.AddEvent(MIDIEvent(0, MIDIEvent::Extended, 0, Data, 10));
 
-    Data[0] = MetaData;
-    Data[1] = EndOfTrack;
+    Data[0] = StatusCodes::MetaData;
+    Data[1] = MetaDataTypes::EndOfTrack;
 
-    Track.AddEvent(MIDIEvent(0, Extended, 0, Data, 2));
+    Track.AddEvent(MIDIEvent(0, MIDIEvent::Extended, 0, Data, 2));
 
     container.AddTrack(Track);
 
-    std::vector<uint8_t>::const_iterator it = data.begin() + 7;
+    auto it = data.begin() + 7;
 
     return ProcessSMFTrack(it, data.end(), container, false);
 }

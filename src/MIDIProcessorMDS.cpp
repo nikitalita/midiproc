@@ -1,7 +1,6 @@
 
 /** $VER: MIDIProcessorMDS.cpp (2023.08.14) MIDI Stream. created by Microsoft with the release of Windows 95 (http://www.vgmpf.com/Wiki/index.php?title=MDS) **/
-#include "../compat/common_compat.h"
-
+#include "common_compat.h"
 #include "MIDIProcessor.h"
 
 bool MIDIProcessor::IsMDS(std::vector<uint8_t> const & data)
@@ -28,8 +27,8 @@ bool MIDIProcessor::ProcessMDS(std::vector<uint8_t> const & data, MIDIContainer 
     if (data.size() < 20)
         return false;
 
-    std::vector<uint8_t>::const_iterator it = data.begin() + 16;
-    std::vector<uint8_t>::const_iterator end = data.end();
+    auto it = data.begin() + 16;
+    auto end = data.end();
 
     uint32_t TimeFormat = 1;
     uint32_t Flags = 0;
@@ -88,7 +87,7 @@ bool MIDIProcessor::ProcessMDS(std::vector<uint8_t> const & data, MIDIContainer 
     {
         MIDITrack Track;
 
-        Track.AddEvent(MIDIEvent(0, Extended, 0, MIDIEventEndOfTrack, _countof(MIDIEventEndOfTrack)));
+        Track.AddEvent(MIDIEvent(0, MIDIEvent::Extended, 0, MIDIEventEndOfTrack, _countof(MIDIEventEndOfTrack)));
         container.AddTrack(Track);
     }
 
@@ -97,7 +96,7 @@ bool MIDIProcessor::ProcessMDS(std::vector<uint8_t> const & data, MIDIContainer 
 
     uint32_t DataSize = (uint32_t) (it[0] | (it[1] << 8) | (it[2] << 16) | (it[3] << 24)); it += 4;
 
-    std::vector<uint8_t>::const_iterator BodyEnd = it + (int) DataSize;
+    auto BodyEnd = it + (int) DataSize;
 
     if (BodyEnd - it < 4)
         return false;
@@ -119,7 +118,7 @@ bool MIDIProcessor::ProcessMDS(std::vector<uint8_t> const & data, MIDIContainer 
 
         uint32_t SegmentSize = (uint32_t) (it[0] | (it[1] << 8) | (it[2] << 16) | (it[3] << 24)); it += 4;
 
-        std::vector<uint8_t>::const_iterator SegmentEnd = it + (int) SegmentSize;
+        auto SegmentEnd = it + (int) SegmentSize;
 
         while ((it != SegmentEnd) && (it != BodyEnd))
         {
@@ -145,13 +144,13 @@ bool MIDIProcessor::ProcessMDS(std::vector<uint8_t> const & data, MIDIContainer 
 
             if ((Event >> 24) == 0x01)
             {
-                uint8_t Data[5] = { MetaData, SetTempo };
+                uint8_t Data[5] = { StatusCodes::MetaData, MetaDataTypes::SetTempo };
 
                 Data[2] = (uint8_t) (Event >> 16);
                 Data[3] = (uint8_t) (Event >> 8);
                 Data[4] = (uint8_t)  Event;
 
-                container.AddEventToTrack(0, MIDIEvent(Timestamp, Extended, 0, Data, sizeof(Data)));
+                container.AddEventToTrack(0, MIDIEvent(Timestamp, MIDIEvent::Extended, 0, Data, sizeof(Data)));
             }
             else
             if ((Event >> 24) == 0x00)
@@ -169,13 +168,13 @@ bool MIDIProcessor::ProcessMDS(std::vector<uint8_t> const & data, MIDIContainer 
                         Size = 2;
                     }
 
-                    Track.AddEvent(MIDIEvent(Timestamp, (EventType) (StatusCode - 8), Event & 0x0F, Data, Size));
+                    Track.AddEvent(MIDIEvent(Timestamp, (MIDIEvent::EventType) (StatusCode - 8), Event & 0x0F, Data, Size));
                 }
             }
         }
     }
 
-    Track.AddEvent(MIDIEvent(Timestamp, Extended, 0, MIDIEventEndOfTrack, _countof(MIDIEventEndOfTrack)));
+    Track.AddEvent(MIDIEvent(Timestamp, MIDIEvent::Extended, 0, MIDIEventEndOfTrack, _countof(MIDIEventEndOfTrack)));
 
     container.AddTrack(Track);
 

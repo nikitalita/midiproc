@@ -5,7 +5,6 @@
 
 // include time.h for time_t
 #ifdef _WIN32
-#include <windows.h>
 #include <time.h>
 #else
 #include <sys/time.h>
@@ -40,9 +39,6 @@ int samples_remaining = 0;
 void reload_sample_queue(){
     // take the chu
 }
-
-#undef  SDL_main
-#define SDL_main main
 
 int main(int argc, char ** argv){
     // first argument is the file to test
@@ -80,7 +76,7 @@ int main(int argc, char ** argv){
     fclose(file);
     size_t start = get_time_in_us();
     uint8_t * data_out;
-    size_t data_out_size = MIDPROC_process_and_serialize_to_smf(data, file_size, extension, &data_out);
+    size_t data_out_size = process_and_serialize_to_smf(data, file_size, extension, &data_out);
     if (data_out_size == 0)
     {
         printf("Failed to process data\n");
@@ -126,7 +122,7 @@ int main(int argc, char ** argv){
         printf("Failed to initialize mixer\n");
         return 1;
     }
-    if (Mix_SetSoundFonts("/Users/andyvand/Downloads/FluidR3 GM.SF2") == 0)
+    if (Mix_SetSoundFonts("/Users/nikita/Library/Audio/Sounds/Banks/Live_HQ_Natural_edit.sf2") == 0)
     {
         printf("Failed to set soundfont\n");
         return 1;
@@ -140,15 +136,15 @@ int main(int argc, char ** argv){
     // copy the header from the output data
     uint8_t header[14];
     memcpy(header, data_out, 14);
-    chunk = Mix_LoadWAV("/Users/andyvand/Downloads/gun-gunshot-02.wav");
+    chunk = Mix_LoadWAV("/Users/nikita/Workspace/libmidiproc/test-files/gun-gunshot-01.wav");
     if (chunk == NULL)
     {
         printf("Failed to load chunk\n");
         return 1;
     }
     samples_remaining = chunk->alen / 2;
-
-    Mix_Music * music = Mix_LoadMUSType_RW_ARG(SDL_RWFromConstMem(data_out, data_out_size), MUS_MID, 1, "s1;p512;");
+    
+    Mix_Music * music = Mix_LoadMUSType_RW_ARG(SDL_RWFromConstMem(data_out, data_out_size), MUS_MID, 1, "s4;p512;");
     if (music == NULL)
     {
         printf("Failed to load music\n");

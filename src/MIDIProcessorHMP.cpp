@@ -2,9 +2,7 @@
 /** $VER: MIDIProcessorHMP.cpp (2023.08.14) Human Machine Interfaces MIDI P (http://www.vgmpf.com/Wiki/index.php?title=HMP) **/
 
 #include "MIDIProcessor.h"
-
-#include "../compat/common_compat.h"
-
+#include "common_compat.h"
 bool MIDIProcessor::IsHMP(std::vector<uint8_t> const & data)
 {
     if (data.size() < 8)
@@ -28,8 +26,8 @@ bool MIDIProcessor::ProcessHMP(std::vector<uint8_t> const & data, MIDIContainer 
     if (Offset >= data.size())
         return false;
 
-    std::vector<uint8_t>::const_iterator it = data.begin() + (int) Offset;
-    std::vector<uint8_t>::const_iterator end = data.end();
+    auto it = data.begin() + (int) Offset;
+    auto end = data.end();
 
     track_count_8 = *it;
 
@@ -49,8 +47,8 @@ bool MIDIProcessor::ProcessHMP(std::vector<uint8_t> const & data, MIDIContainer 
     {
         MIDITrack Track;
 
-        Track.AddEvent(MIDIEvent(0, Extended, 0, DefaultTempoHMP, _countof(DefaultTempoHMP)));
-        Track.AddEvent(MIDIEvent(0, Extended, 0, MIDIEventEndOfTrack, _countof(MIDIEventEndOfTrack)));
+        Track.AddEvent(MIDIEvent(0, MIDIEvent::Extended, 0, DefaultTempoHMP, _countof(DefaultTempoHMP)));
+        Track.AddEvent(MIDIEvent(0, MIDIEvent::Extended, 0, MIDIEventEndOfTrack, _countof(MIDIEventEndOfTrack)));
 
         container.AddTrack(Track);
     }
@@ -134,7 +132,7 @@ bool MIDIProcessor::ProcessHMP(std::vector<uint8_t> const & data, MIDIContainer 
 
         std::vector<uint8_t> Temp(3);
 
-        std::vector<uint8_t>::const_iterator TrackDataEnd = it + (int) track_size_32;
+        auto TrackDataEnd = it + (int) track_size_32;
 
         while (it != TrackDataEnd)
         {
@@ -166,7 +164,7 @@ bool MIDIProcessor::ProcessHMP(std::vector<uint8_t> const & data, MIDIContainer 
                 std::copy(it, it + MetadataSize, Temp.begin() + 2);
                 it += MetadataSize;
 
-                track.AddEvent(MIDIEvent(Timestamp, Extended, 0, &Temp[0], (size_t) (MetadataSize + 2)));
+                track.AddEvent(MIDIEvent(Timestamp, MIDIEvent::Extended, 0, &Temp[0], (size_t) (MetadataSize + 2)));
 
                 if (Temp[1] == 0x2F)
                     break;
@@ -189,7 +187,7 @@ bool MIDIProcessor::ProcessHMP(std::vector<uint8_t> const & data, MIDIContainer 
                 std::copy(it, it + (int) bytes_read, Temp.begin() + 1);
                 it += bytes_read;
 
-                track.AddEvent(MIDIEvent(Timestamp, (EventType)((Temp[0] >> 4) - 8), (uint32_t) (Temp[0] & 0x0F), &Temp[1], bytes_read));
+                track.AddEvent(MIDIEvent(Timestamp, (MIDIEvent::EventType) ((Temp[0] >> 4) - 8), (uint32_t) (Temp[0] & 0x0F), &Temp[1], bytes_read));
             }
             else return false; /*throw exception_io_data( "Unexpected status code in HMP track" );*/
         }
@@ -231,4 +229,4 @@ uint32_t MIDIProcessor::DecodeVariableLengthQuantityHMP(std::vector<uint8_t>::co
     return Quantity;
 }
 
-const uint8_t MIDIProcessor::DefaultTempoHMP[5] = { MetaData, SetTempo, 0x18, 0x80, 0x00 };
+const uint8_t MIDIProcessor::DefaultTempoHMP[5] = { StatusCodes::MetaData, MetaDataTypes::SetTempo, 0x18, 0x80, 0x00 };

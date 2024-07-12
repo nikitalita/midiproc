@@ -1,9 +1,8 @@
 
 /** $VER: MIDIProcessorMUS.cpp (2023.08.14) Created by Paul Radek for his DMX audio library. Used by id Software for Doom and several other games. (https://moddingwiki.shikadi.net/wiki/MUS_Format) **/
+
 #include "MIDIProcessor.h"
-
-#include "../compat/common_compat.h"
-
+#include "common_compat.h"
 bool MIDIProcessor::IsMUS(std::vector<uint8_t> const & data)
 {
     if (data.size() < 0x20)
@@ -32,8 +31,8 @@ bool MIDIProcessor::ProcessMUS(std::vector<uint8_t> const & data, MIDIContainer 
     {
         MIDITrack Track;
 
-        Track.AddEvent(MIDIEvent(0, Extended, 0, DefaultTempoMUS, _countof(DefaultTempoMUS)));
-        Track.AddEvent(MIDIEvent(0, Extended, 0, MIDIEventEndOfTrack, _countof(MIDIEventEndOfTrack)));
+        Track.AddEvent(MIDIEvent(0, MIDIEvent::Extended, 0, DefaultTempoMUS, _countof(DefaultTempoMUS)));
+        Track.AddEvent(MIDIEvent(0, MIDIEvent::Extended, 0, MIDIEventEndOfTrack, _countof(MIDIEventEndOfTrack)));
 
         container.AddTrack(Track);
     }
@@ -47,7 +46,7 @@ bool MIDIProcessor::ProcessMUS(std::vector<uint8_t> const & data, MIDIContainer 
 
     uint8_t VelocityLevels[16] = { 0 };
 
-    std::vector<uint8_t>::const_iterator it = data.begin() + Offset, end = data.begin() + Offset + Length;
+    auto it = data.begin() + Offset, end = data.begin() + Offset + Length;
 
     uint8_t Data[4];
 
@@ -58,7 +57,7 @@ bool MIDIProcessor::ProcessMUS(std::vector<uint8_t> const & data, MIDIContainer 
         if (Data[0] == 0x60)
             break;
 
-        EventType EventType;
+        MIDIEvent::EventType EventType;
         uint32_t EventSize;
 
         uint32_t Channel = (uint32_t) (Data[0] & 0x0F);
@@ -73,7 +72,7 @@ bool MIDIProcessor::ProcessMUS(std::vector<uint8_t> const & data, MIDIContainer 
         {
             // Release Note
             case 0x00:
-                EventType = NoteOffE;
+                EventType = MIDIEvent::NoteOff;
 
                 if (it == end)
                     return false;
@@ -85,7 +84,7 @@ bool MIDIProcessor::ProcessMUS(std::vector<uint8_t> const & data, MIDIContainer 
 
             // PLay Note
             case 0x10:
-                EventType = NoteOnE;
+                EventType = MIDIEvent::NoteOn;
 
                 if (it == end)
                     return false;
@@ -109,7 +108,7 @@ bool MIDIProcessor::ProcessMUS(std::vector<uint8_t> const & data, MIDIContainer 
 
             // Pitch Bend
             case 0x20:
-                EventType = PitchBendChangeE;
+                EventType = MIDIEvent::PitchBendChange;
 
                 if (it == end)
                     return false;
@@ -122,7 +121,7 @@ bool MIDIProcessor::ProcessMUS(std::vector<uint8_t> const & data, MIDIContainer 
 
             // System Event
             case 0x30:
-                EventType = ControlChangeE;
+                EventType = MIDIEvent::ControlChange;
 
                 if (it == end)
                     return false;
@@ -150,7 +149,7 @@ bool MIDIProcessor::ProcessMUS(std::vector<uint8_t> const & data, MIDIContainer 
                 {
                     if (Data[1] < 10)
                     {
-                        EventType = ControlChangeE;
+                        EventType = MIDIEvent::ControlChange;
 
                         Data[1] = MusControllers[Data[1]];
 
@@ -165,7 +164,7 @@ bool MIDIProcessor::ProcessMUS(std::vector<uint8_t> const & data, MIDIContainer 
                 }
                 else
                 {
-                    EventType = ProgramChangeE;
+                    EventType = MIDIEvent::ProgramChange;
 
                     if (it == end)
                         return false;
@@ -201,12 +200,12 @@ bool MIDIProcessor::ProcessMUS(std::vector<uint8_t> const & data, MIDIContainer 
         }
     }
 
-    Track.AddEvent(MIDIEvent(Timestamp, Extended, 0, MIDIEventEndOfTrack, _countof(MIDIEventEndOfTrack)));
+    Track.AddEvent(MIDIEvent(Timestamp, MIDIEvent::Extended, 0, MIDIEventEndOfTrack, _countof(MIDIEventEndOfTrack)));
 
     container.AddTrack(Track);
 
     return true;
 }
 
-const uint8_t MIDIProcessor::DefaultTempoMUS[5] = { MetaData, SetTempo, 0x09, 0xA3, 0x1A };
+const uint8_t MIDIProcessor::DefaultTempoMUS[5] = { StatusCodes::MetaData, MetaDataTypes::SetTempo, 0x09, 0xA3, 0x1A };
 const uint8_t MIDIProcessor::MusControllers[15] = { 0, 0, 1, 7, 10, 11, 91, 93, 64, 67, 120, 123, 126, 127, 121 };
