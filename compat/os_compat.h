@@ -16,7 +16,11 @@
 #include <wchar.h>
 
 #ifndef MAX_PATH
+#ifdef PATH_MAX
 #define MAX_PATH PATH_MAX
+#else
+#define MAX_PATH 256
+#endif
 #endif
 
 #ifndef WCHAR
